@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "bun --watch src/index.ts",
-    "build": "bun build src --outdir ./dist"
+    "build": "bun build src --outdir ./dist --target node"
   },
   "devDependencies": {
     "@types/bun": "latest"
@@ -19,6 +19,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/multer": "^2.1.0",
+    "@types/node": "^25.9.1",
     "@types/ws": "^8.18.1",
     "better-auth": "^1.6.11",
     "bullmq": "^5.77.3",
