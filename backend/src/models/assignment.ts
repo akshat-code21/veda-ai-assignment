@@ -27,6 +27,7 @@ const AssignmentSchema = new mongoose.Schema({
     },
     jobId: { type: String },
     errorMessage: { type: String },
+    pdfUrl: { type: String }
 }
 )
 

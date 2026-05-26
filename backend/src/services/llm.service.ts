@@ -96,13 +96,24 @@ Return ONLY valid JSON matching the schema. No preamble, no markdown.`;
         },
     ];
 
-    const response = await openrouter.chat.send({
-        chatRequest: {
-            model: "google/gemma-3-27b-it:free",
-            messages,
-            responseFormat: { type: "json_object" },
+    let response;
+    try {
+        response = await openrouter.chat.send({
+            chatRequest: {
+                model: "openai/gpt-oss-120b:free",
+                messages,
+                responseFormat: { type: "json_object" },
+            }
+        });
+    } catch (err: any) {
+        if (err.name === "ResponseValidationError") {
+            console.error("\nOpenRouter ResponseValidationError:\n", err.pretty ? err.pretty() : err);
+            console.error("\nRaw response value received from OpenRouter API:\n", JSON.stringify(err.rawValue, null, 2));
+        } else {
+            console.error("Error calling OpenRouter:", err);
         }
-    });
+        throw err;
+    }
 
     const raw = response.choices[0]?.message?.content;
     if (!raw) throw new Error("LLM returned an empty response");
