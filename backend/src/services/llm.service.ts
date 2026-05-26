@@ -13,6 +13,7 @@ const QuestionSchema = z.object({
     marks: z.number(),
     type: z.string(),
     options: z.array(z.string()).optional(),
+    answer: z.string().optional(),
 });
 
 const SectionSchema = z.object({
@@ -56,13 +57,14 @@ The JSON must strictly match this schema:
           "difficulty": "easy" | "medium" | "hard",
           "marks": 2,
           "type": "mcq" | "short" | "long" | "true_false",
-          "options": ["A. ...", "B. ...", "C. ...", "D. ..."]  // only for MCQ
+          "options": ["A. ...", "B. ...", "C. ...", "D. ..."],  // only for MCQ
+          "answer": "Ideal model answer or answer key explanation for this question"
         }
       ]
     }
   ]
 }
-Always include "options" only for MCQ type questions. Never include it for other types.`;
+Always include "options" only for MCQ type questions. Never include it for other types. Always provide an answer in the "answer" field for all questions.`;
 
     const userPrompt = `Generate a question paper with the following requirements:
 

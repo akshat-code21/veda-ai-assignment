@@ -22,6 +22,7 @@ const AssignmentSchema = new mongoose.Schema({
                 marks: { type: Number },
                 type: { type: String },
                 options: [String],
+                answer: { type: String },
             }]
         }]
     },
