@@ -42,4 +42,4 @@ const upload = multer({
 
 })
 
-const uploadMiddleware = upload.single("source_file")
+export const uploadMiddleware = upload.single("source_file")

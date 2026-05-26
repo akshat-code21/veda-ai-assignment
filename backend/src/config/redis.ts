@@ -1,13 +1,8 @@
-import { Redis } from "ioredis"
+import IORedis from "ioredis"
 import { env } from "./env"
 
-export const redis = new Redis({
-    host: env.REDIS_URL,
-    port: 6379,
-    password: env.REDIS_PASSWORD,
+export const redis = new IORedis(env.REDIS_URL, {
     maxRetriesPerRequest: null,
-    enableReadyCheck: false,
-    lazyConnect: true,
 })
 
 
