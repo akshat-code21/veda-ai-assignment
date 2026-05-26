@@ -153,13 +153,6 @@ export async function generatePdfBuffer(
                 }
             }
 
-            const pages = doc.bufferedPageRange();
-            for (let i = 0; i < pages.count; i++) {
-                doc.switchToPage(i);
-                doc.fontSize(8.5).fillColor("#777777")
-                    .text(`Page ${i + 1} of ${pages.count}`, 50, 750, { align: "center" });
-            }
-
             doc.end();
         } catch (error) {
             reject(error);
