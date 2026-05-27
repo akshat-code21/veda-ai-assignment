@@ -32,12 +32,17 @@ const tabs: TabItem[] = [
   },
 ]
 
-export function BottomNav() {
+interface BottomNavProps {
+  onAddAssignment?: () => void
+}
+
+export function BottomNav({ onAddAssignment }: BottomNavProps) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col items-end gap-3 px-2.5 pb-4 lg:hidden">
       {/* FAB Button */}
       <button
         type="button"
+        onClick={onAddAssignment}
         className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)] transition-transform hover:scale-105 active:scale-95"
         aria-label="Create new assignment"
         id="mobile-fab-create"

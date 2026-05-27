@@ -1,7 +1,11 @@
 import { Plus } from "lucide-react"
 import { Button } from "./ui/button"
 
-export function EmptyState() {
+interface EmptyStateProps {
+  onCreateFirst?: () => void
+}
+
+export function EmptyState({ onCreateFirst }: EmptyStateProps) {
   return (
     <section className="flex flex-1 flex-col items-center justify-center px-4">
       <div className="flex flex-col items-center gap-3">
@@ -28,6 +32,7 @@ export function EmptyState() {
       {/* CTA Button */}
       <Button
         type="button"
+        onClick={onCreateFirst}
         className="w-[277px] h-[46px] px-6 py-3 rounded-[48px] mt-8 flex flex-row items-center justify-center gap-1 text-white border-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black transition-all hover:opacity-90 active:scale-[0.98]"
         style={{
           background:

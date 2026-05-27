@@ -38,7 +38,12 @@ const navItems: NavItem[] = [
   },
 ]
 
-export function Sidebar() {
+interface SidebarProps {
+  assignmentsCount?: number
+  onAddAssignment?: () => void
+}
+
+export function Sidebar({ assignmentsCount = 0, onAddAssignment }: SidebarProps) {
   return (
     <aside className="hidden lg:flex h-[calc(100svh-24px)] w-[304px] min-w-[304px] flex-col justify-between rounded-2xl bg-white shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)]">
       {/* Top section */}
@@ -59,6 +64,7 @@ export function Sidebar() {
         <div className="mt-14">
           <Button
             type="button"
+            onClick={onAddAssignment}
             className="relative flex w-[251px] h-[42px] items-center justify-center gap-[10px] px-[43px] py-[7px] text-white cursor-pointer transition-all hover:opacity-90 active:scale-[0.98] outline-none border-none bg-transparent hover:bg-transparent"
             style={{
               background:
@@ -99,6 +105,11 @@ export function Sidebar() {
                 {item.icon}
               </span>
               <span className="leading-[22px]">{item.label}</span>
+              {item.label === "Assignments" && assignmentsCount > 0 && (
+                <span className="ml-auto bg-[#FF7950] text-white text-[12px] font-bold px-[8px] py-[2.5px] rounded-full shrink-0 select-none">
+                  {assignmentsCount}
+                </span>
+              )}
             </a>
           ))}
         </nav>
