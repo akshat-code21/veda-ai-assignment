@@ -33,19 +33,18 @@ const DEFAULT_QUESTION_TYPES: QuestionType[] = [
 interface CreateAssignmentProps {
   onBack: () => void
   onCreateAssignment: (assignment: Assignment) => void
+  onNext?: () => void
 }
 
-export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmentProps) {
+export function CreateAssignment({ onBack, onCreateAssignment, onNext }: CreateAssignmentProps) {
   const [questionTypes, setQuestionTypes] = useState<QuestionType[]>(DEFAULT_QUESTION_TYPES)
   const [dueDate, setDueDate] = useState("")
   const [additionalInfo, setAdditionalInfo] = useState("")
   const [file, setFile] = useState<File | null>(null)
 
-  // Computed totals
   const totalQuestions = questionTypes.reduce((sum, qt) => sum + qt.numQuestions, 0)
   const totalMarks = questionTypes.reduce((sum, qt) => sum + qt.numQuestions * qt.marks, 0)
 
-  // Handlers for question type rows
   const updateQuestionTypeValue = (id: string, field: "numQuestions" | "marks", newValue: number) => {
     setQuestionTypes((prev) =>
       prev.map((qt) => {
@@ -77,19 +76,15 @@ export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmen
     )
   }
 
-  // Handle Form Submission
   const handleSubmit = () => {
-    // Format today's date as DD-MM-YYYY
     const todayObj = new Date()
     const d = String(todayObj.getDate()).padStart(2, "0")
     const m = String(todayObj.getMonth() + 1).padStart(2, "0")
     const y = todayObj.getFullYear()
     const assignedDate = `${d}-${m}-${y}`
 
-    // Derive a gorgeous title
     let title = "Custom Assignment"
     if (file) {
-      // Remove file extension
       const baseName = file.name.replace(/\.[^/.]+$/, "")
       title = `${baseName} Assignment`
     } else if (questionTypes.length > 0) {
@@ -100,7 +95,7 @@ export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmen
       id: String(Date.now()),
       title,
       assignedDate,
-      dueDate: dueDate || assignedDate, // Fallback if due date is empty
+      dueDate: dueDate || assignedDate,
     }
 
     onCreateAssignment(newAssignment)
@@ -108,7 +103,6 @@ export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmen
 
   return (
     <section className="flex flex-1 flex-col px-4 lg:px-8 pb-10">
-      {/* Desktop Header */}
       <div className="hidden lg:flex items-center gap-3 mt-4 mb-4">
         <span className="h-[12px] w-[12px] rounded-full bg-[#22C55E] shrink-0" />
         <div className="flex flex-col">
@@ -121,7 +115,6 @@ export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmen
         </div>
       </div>
 
-      {/* Mobile Header */}
       <div className="flex lg:hidden items-center justify-between mt-3 mb-4 relative">
         <Button
           type="button"
@@ -139,15 +132,12 @@ export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmen
       </div>
 
       <div className="px-12 py-8">
-        {/* Progress Bar */}
         <div className="flex gap-2 mb-6">
           <div className="flex-1 h-[4px] rounded-full bg-[#303030]" />
           <div className="flex-1 h-[4px] rounded-full bg-[#D9D9D9]" />
         </div>
 
-        {/* Form Card */}
         <div className="bg-white/50 backdrop-blur-3xl border border-white/60 rounded-2xl p-5 lg:p-8 shadow-[0px_8px_32px_rgba(0,0,0,0.04)]">
-          {/* Section Title */}
           <h2 className="font-heading text-xl lg:text-[22px] font-bold text-[#303030] leading-tight">
             Assignment Details
           </h2>
@@ -155,10 +145,8 @@ export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmen
             Basic information about your assignment
           </p>
 
-          {/* File Upload Zone */}
           <FileUpload file={file} onChange={setFile} />
 
-          {/* Due Date */}
           <div className="mt-6">
             <label className="font-heading text-base font-bold text-[#303030] block mb-2">
               Due Date
@@ -166,9 +154,7 @@ export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmen
             <DatePicker value={dueDate} onChange={setDueDate} />
           </div>
 
-          {/* Question Type Section */}
           <div className="mt-6">
-            {/* Desktop column headers */}
             <div className="hidden lg:flex items-center gap-4 mb-3">
               <span className="font-heading text-base font-bold text-[#303030] flex-1">
                 Question Type
@@ -181,12 +167,10 @@ export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmen
               </span>
             </div>
 
-            {/* Mobile label */}
             <span className="lg:hidden font-heading text-base font-bold text-[#303030] block mb-3">
               Question Type
             </span>
 
-            {/* Question Type Rows */}
             <div className="flex flex-col gap-4">
               {questionTypes.map((qt) => (
                 <QuestionTypeRow
@@ -200,7 +184,6 @@ export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmen
               ))}
             </div>
 
-            {/* Add Question Type */}
             <Button
               type="button"
               variant="ghost"
@@ -215,7 +198,6 @@ export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmen
               </span>
             </Button>
 
-            {/* Totals */}
             <div className="mt-4 flex flex-col items-end gap-0.5">
               <p className="font-heading text-sm font-medium text-[#303030]">
                 Total Questions : {totalQuestions}
@@ -226,7 +208,6 @@ export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmen
             </div>
           </div>
 
-          {/* Additional Information */}
           <div className="mt-6">
             <label className="font-heading text-base font-bold text-[#303030] block mb-2">
               Additional Information (For better output)
@@ -250,7 +231,6 @@ export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmen
           </div>
         </div>
 
-        {/* Bottom Action Buttons */}
         <div className="flex items-center justify-between mt-6 pb-4 lg:pb-0 gap-4">
           <Button
             type="button"
@@ -263,7 +243,7 @@ export function CreateAssignment({ onBack, onCreateAssignment }: CreateAssignmen
           </Button>
           <Button
             type="button"
-            onClick={handleSubmit}
+            onClick={onNext ?? handleSubmit}
             className="flex items-center gap-2 h-[46px] px-8 rounded-full bg-[#181818] text-white hover:bg-neutral-800 font-heading font-medium active:scale-98 transition-all"
           >
             Next

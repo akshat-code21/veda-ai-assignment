@@ -5,9 +5,13 @@ import { EmptyState } from "@/components/EmptyState"
 import { BottomNav } from "@/components/BottomNav"
 import { FilledState } from "@/components/FilledState"
 import { CreateAssignment } from "@/components/CreateAssignment"
+import { AssignmentOutput } from "@/components/AssignmentOutput"
 import type { Assignment } from "@/components/FilledState"
 
-type ViewState = "list" | "create"
+type ViewState = "list" | "create" | "output"
+
+const SAMPLE_PDF_URL =
+  "https://d7fyggfoy4ifa.cloudfront.net/6a155fca7664bf9454dd642a.pdf"
 
 const INITIAL_ASSIGNMENTS: Assignment[] = [
   { id: "1", title: "Quiz on Electricity", assignedDate: "20-06-2025", dueDate: "21-06-2025" },
@@ -43,8 +47,7 @@ export function Dashboard() {
   }
 
   return (
-    <div className="flex h-svh overflow-hidden bg-[#CECECE] lg:bg-linear-to-b lg:from-[#EEEEEE] lg:to-[#DADADA]">
-      {/* Sidebar — Desktop only */}
+    <div className="flex h-screen! overflow-hidden bg-[#CECECE] lg:bg-linear-to-b lg:from-[#EEEEEE] lg:to-[#DADADA]">
       <div className="hidden lg:block p-3 h-full shrink-0">
         <Sidebar
           assignmentsCount={assignments.length}
@@ -52,17 +55,20 @@ export function Dashboard() {
         />
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex flex-1 flex-col min-w-0 overflow-y-auto">
-        {/* Top Bar */}
-        <div className="p-2.5 lg:px-0 lg:pt-3 lg:pr-3">
+      <div className="flex flex-1 flex-col min-w-0 h-full overflow-y-auto">
+        <div className="p-2.5 lg:px-0 lg:pt-3 lg:pr-3 shrink-0">
           <TopBar />
         </div>
 
-        {/* View Router */}
-        {currentView === "create" ? (
+        {currentView === "output" ? (
+          <AssignmentOutput
+            onBack={() => setCurrentView("create")}
+            pdfUrl={SAMPLE_PDF_URL}
+          />
+        ) : currentView === "create" ? (
           <CreateAssignment
             onBack={handleBackToList}
+            onNext={() => setCurrentView("output")}
             onCreateAssignment={(newAssignment) => {
               setAssignments((prev) => [newAssignment, ...prev])
               setCurrentView("list")
@@ -78,12 +84,12 @@ export function Dashboard() {
           <EmptyState onCreateFirst={handleCreateFirstAssignment} />
         )}
 
-        {/* Bottom padding for mobile bottom nav */}
-        <div className="h-40 lg:hidden" />
+        {currentView !== "output" && <div className="h-40 lg:hidden" />}
       </div>
 
-      {/* Bottom Navigation — Mobile only */}
-      <BottomNav onAddAssignment={handleNavigateToCreate} />
+      {currentView !== "output" && (
+        <BottomNav onAddAssignment={handleNavigateToCreate} />
+      )}
     </div>
   )
 }
