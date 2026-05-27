@@ -4,7 +4,10 @@ import { TopBar } from "@/components/TopBar"
 import { EmptyState } from "@/components/EmptyState"
 import { BottomNav } from "@/components/BottomNav"
 import { FilledState } from "@/components/FilledState"
+import { CreateAssignment } from "@/components/CreateAssignment"
 import type { Assignment } from "@/components/FilledState"
+
+type ViewState = "list" | "create"
 
 const INITIAL_ASSIGNMENTS: Assignment[] = [
   { id: "1", title: "Quiz on Electricity", assignedDate: "20-06-2025", dueDate: "21-06-2025" },
@@ -21,43 +24,14 @@ const INITIAL_ASSIGNMENTS: Assignment[] = [
 
 export function Dashboard() {
   const [assignments, setAssignments] = useState<Assignment[]>(INITIAL_ASSIGNMENTS)
+  const [currentView, setCurrentView] = useState<ViewState>("list")
 
-  const handleAddAssignment = () => {
-    const nextId = String(Date.now())
-    const topics = [
-      "Quantum Mechanics Quiz",
-      "Human Nervous System Test",
-      "Ecosystems & Food Chains",
-      "Heat Transfer & Thermodynamics",
-      "Genetics & DNA Structure",
-      "Astrophysics & Solar Systems",
-      "Invertebrates & Classification",
-      "Erosion & Plate Tectonics",
-      "Organic Chemistry Basics",
-    ]
-    const randomTopic = topics[Math.floor(Math.random() * topics.length)]
+  const handleNavigateToCreate = () => {
+    setCurrentView("create")
+  }
 
-    // Format date nicely (DD-MM-YYYY)
-    const today = new Date()
-    const formatDate = (date: Date) => {
-      const dd = String(date.getDate()).padStart(2, '0')
-      const mm = String(date.getMonth() + 1).padStart(2, '0')
-      const yyyy = date.getFullYear()
-      return `${dd}-${mm}-${yyyy}`
-    }
-
-    const assignedDate = formatDate(today)
-    const tomorrow = new Date(today)
-    tomorrow.setDate(today.getDate() + 1)
-    const dueDate = formatDate(tomorrow)
-
-    const newAssignment: Assignment = {
-      id: nextId,
-      title: randomTopic,
-      assignedDate,
-      dueDate,
-    }
-    setAssignments((prev) => [newAssignment, ...prev])
+  const handleBackToList = () => {
+    setCurrentView("list")
   }
 
   const handleDeleteAssignment = (id: string) => {
@@ -74,7 +48,7 @@ export function Dashboard() {
       <div className="hidden lg:block p-3 h-full shrink-0">
         <Sidebar
           assignmentsCount={assignments.length}
-          onAddAssignment={handleAddAssignment}
+          onAddAssignment={handleNavigateToCreate}
         />
       </div>
 
@@ -85,12 +59,20 @@ export function Dashboard() {
           <TopBar />
         </div>
 
-        {/* Dynamic empty/filled state */}
-        {assignments.length > 0 ? (
+        {/* View Router */}
+        {currentView === "create" ? (
+          <CreateAssignment
+            onBack={handleBackToList}
+            onCreateAssignment={(newAssignment) => {
+              setAssignments((prev) => [newAssignment, ...prev])
+              setCurrentView("list")
+            }}
+          />
+        ) : assignments.length > 0 ? (
           <FilledState
             assignments={assignments}
             onDeleteAssignment={handleDeleteAssignment}
-            onAddAssignment={handleAddAssignment}
+            onAddAssignment={handleNavigateToCreate}
           />
         ) : (
           <EmptyState onCreateFirst={handleCreateFirstAssignment} />
@@ -101,7 +83,7 @@ export function Dashboard() {
       </div>
 
       {/* Bottom Navigation — Mobile only */}
-      <BottomNav onAddAssignment={handleAddAssignment} />
+      <BottomNav onAddAssignment={handleNavigateToCreate} />
     </div>
   )
 }
