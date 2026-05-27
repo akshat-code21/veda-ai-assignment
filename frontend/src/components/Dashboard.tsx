@@ -5,7 +5,7 @@ import { BottomNav } from "@/components/BottomNav"
 
 export function Dashboard() {
   return (
-    <div className="flex min-h-svh bg-[#CECECE] lg:bg-gradient-to-b lg:from-[#EEEEEE] lg:to-[#DADADA]">
+    <div className="flex min-h-svh bg-[#CECECE] lg:bg-linear-to-b lg:from-[#EEEEEE] lg:to-[#DADADA]">
       {/* Sidebar — Desktop only */}
       <div className="hidden lg:block p-3">
         <Sidebar />
@@ -22,7 +22,7 @@ export function Dashboard() {
         <EmptyState />
 
         {/* Bottom padding for mobile bottom nav */}
-        <div className="h-36 lg:hidden" />
+        <div className="h-40 lg:hidden" />
       </div>
 
       {/* Bottom Navigation — Mobile only */}

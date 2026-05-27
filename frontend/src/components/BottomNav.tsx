@@ -1,4 +1,10 @@
-import { Home, Calendar, FileText, Sparkles, Plus } from "lucide-react"
+import {
+  Home,
+  Calendar,
+  FileText,
+  Sparkles,
+  Plus,
+} from "lucide-react"
 
 interface TabItem {
   label: string
@@ -32,7 +38,7 @@ export function BottomNav() {
       {/* FAB Button */}
       <button
         type="button"
-        className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)]"
+        className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)] transition-transform hover:scale-105 active:scale-95"
         aria-label="Create new assignment"
         id="mobile-fab-create"
       >
@@ -48,7 +54,11 @@ export function BottomNav() {
           <a
             key={tab.label}
             href="#"
-            className="flex flex-col items-center gap-1"
+            className={`flex flex-col items-center gap-1 rounded-[26px] px-2 py-1.5 transition-colors ${
+              tab.active
+                ? "bg-white/10"
+                : "bg-transparent"
+            }`}
           >
             <span
               className={
@@ -58,7 +68,7 @@ export function BottomNav() {
               {tab.icon}
             </span>
             <span
-              className={`text-xs font-semibold leading-[17px] ${
+              className={`font-heading text-xs font-semibold leading-[17px] ${
                 tab.active ? "text-white" : "text-white/25"
               }`}
             >

@@ -1,11 +1,10 @@
 import {
   LayoutGrid,
-  Users,
   FileText,
-  BookOpen,
-  Library,
   Settings,
-  Plus,
+  Sparkles,
+  Book,
+  ChartPie,
 } from "lucide-react"
 import { Button } from "./ui/button"
 
@@ -22,7 +21,7 @@ const navItems: NavItem[] = [
   },
   {
     label: "My Groups",
-    icon: <Users className="h-5 w-5" />,
+    icon: <img src="/images/group.svg" alt="My Groups" className="h-5 w-5" />,
   },
   {
     label: "Assignments",
@@ -31,27 +30,27 @@ const navItems: NavItem[] = [
   },
   {
     label: "AI Teacher's Toolkit",
-    icon: <BookOpen className="h-5 w-5" />,
+    icon: <Book className="h-5 w-5" />,
   },
   {
     label: "My Library",
-    icon: <Library className="h-5 w-5" />,
+    icon: <ChartPie className="h-5 w-5" />,
   },
 ]
 
 export function Sidebar() {
   return (
-    <aside className="hidden lg:flex w-[304px] min-w-[304px] flex-col rounded-2xl bg-white shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)]">
+    <aside className="hidden lg:flex h-[calc(100svh-24px)] w-[304px] min-w-[304px] flex-col justify-between rounded-2xl bg-white shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)]">
       {/* Top section */}
-      <div className="flex flex-1 flex-col px-7 pt-6 items-center">
+      <div className="flex flex-col px-[27px] pt-6">
         {/* Logo */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           <img
-            src="/images/logo.png"
+            src="/images/logo.svg"
             alt="VedaAI Logo"
-            className="h-10 w-10"
+            className="h-16 w-16 shrink-0 relative top-[8px]"
           />
-          <span className="text-[28px] font-bold leading-5 text-[#303030]">
+          <span className="font-heading text-[28px] font-bold text-[#303030]">
             VedaAI
           </span>
         </div>
@@ -60,34 +59,43 @@ export function Sidebar() {
         <div className="mt-14">
           <Button
             type="button"
-            className="relative flex w-[251px] h-[42px] items-center justify-between gap-[10px] px-[43px] py-[7px] text-white cursor-pointer transition-all hover:opacity-90 active:scale-[0.98] outline-none border-none bg-transparent hover:bg-transparent"
+            className="relative flex w-[251px] h-[42px] items-center justify-center gap-[10px] px-[43px] py-[7px] text-white cursor-pointer transition-all hover:opacity-90 active:scale-[0.98] outline-none border-none bg-transparent hover:bg-transparent"
             style={{
-              background: 'linear-gradient(#272727, #272727) padding-box, linear-gradient(90deg, #FF7950 0%, #C0350A 100%) border-box',
-              border: '4px solid transparent',
-              borderRadius: '100px',
-              boxShadow: '0px 32px 48px 0px rgba(255, 255, 255, 0.2), 0px 16px 48px 0px rgba(255, 255, 255, 0.12), inset 0px 0px 34.5px 0px rgba(255, 255, 255, 0.25), inset 0px -1px 3.5px 0px rgba(177, 177, 177, 0.6)',
+              background:
+                "linear-gradient(#272727, #272727) padding-box, linear-gradient(90deg, #FF7950 0%, #C0350A 100%) border-box",
+              border: "4px solid transparent",
+              borderRadius: "100px",
+              boxShadow:
+                "0px 32px 48px 0px rgba(255, 255, 255, 0.2), 0px 16px 48px 0px rgba(255, 255, 255, 0.12), inset 0px 0px 34.5px 0px rgba(255, 255, 255, 0.25), inset 0px -1px 3.5px 0px rgba(177, 177, 177, 0.6)",
             }}
             id="create-assignment-sidebar"
           >
+            <Sparkles className="h-[17px] w-[18px] shrink-0" />
             <span className="text-base font-medium leading-[28px] font-sans">
               Create Assignment
             </span>
-            <Plus className="h-[17px] w-[18px] shrink-0" />
           </Button>
         </div>
 
         {/* Navigation Menu */}
-        <nav className="mt-[56px] flex flex-col gap-2" aria-label="Main navigation">
+        <nav
+          className="mt-14 flex flex-col gap-2"
+          aria-label="Main navigation"
+        >
           {navItems.map((item) => (
             <a
               key={item.label}
               href="#"
-              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-base transition-colors ${item.active
-                  ? "bg-[#F0F0F0] font-medium text-[#303030]"
-                  : "text-[#5E5E5E]/80 hover:bg-[#F0F0F0]/50"
+              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-base font-heading transition-colors ${item.active
+                ? "bg-[#F0F0F0] font-medium text-[#303030]"
+                : "text-[#5E5E5E]/80 hover:bg-[#F0F0F0]/50"
                 }`}
             >
-              <span className={item.active ? "text-[#303030]" : "text-[#5E5E5E]/80"}>
+              <span
+                className={
+                  item.active ? "text-[#303030]" : "text-[#5E5E5E]/80"
+                }
+              >
                 {item.icon}
               </span>
               <span className="leading-[22px]">{item.label}</span>
@@ -101,7 +109,7 @@ export function Sidebar() {
         {/* Settings */}
         <a
           href="#"
-          className="flex items-center gap-2 rounded-lg px-3 py-2 text-base leading-[22px] text-[#5E5E5E]/80 transition-colors hover:bg-[#F0F0F0]/50"
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-base leading-[22px] font-heading text-[#5E5E5E]/80 transition-colors hover:bg-[#F0F0F0]/50"
         >
           <Settings className="h-5 w-5" />
           <span>Settings</span>
@@ -115,10 +123,10 @@ export function Sidebar() {
             className="h-14 w-[59px] rounded-full object-cover"
           />
           <div className="flex flex-col">
-            <span className="text-base font-bold leading-[22px] text-[#303030]">
+            <span className="font-heading text-base font-bold leading-[22px] text-[#303030]">
               Delhi Public School
             </span>
-            <span className="text-sm leading-5 text-[#5E5E5E]">
+            <span className="font-heading text-sm leading-5 text-[#5E5E5E]">
               Bokaro Steel City
             </span>
           </div>
