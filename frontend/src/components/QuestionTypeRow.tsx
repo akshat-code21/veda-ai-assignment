@@ -78,7 +78,7 @@ export function QuestionTypeRow({
       <div className="lg:hidden bg-[#F9F9F9] border border-[#EEEEEE] rounded-2xl p-4 shadow-[0px_2px_8px_rgba(0,0,0,0.01)] animate-in fade-in duration-200">
         {/* Top row: dropdown + remove button */}
         <div className="flex items-center gap-2 mb-3">
-          <div className="relative flex-1">
+          <div className="relative min-w-0 flex-1">
             <select
               value={questionType.label}
               onChange={(e) => onChangeLabel(e.target.value)}
@@ -104,10 +104,10 @@ export function QuestionTypeRow({
         </div>
 
         {/* Bottom row: steppers side-by-side */}
-        <div className="flex items-center gap-6">
+        <div className="grid grid-cols-2 gap-3 bg-[#F0F0F0] rounded-[24px] p-[8px]">
           {/* No. of Questions */}
-          <div className="flex-1 flex flex-col items-center gap-1.5">
-            <span className="text-xs font-sans font-semibold text-[#5E5E5E] select-none">
+          <div className="min-w-0 flex flex-col items-center gap-1.5">
+            <span className="text-center text-xs font-sans font-semibold text-[#5E5E5E] select-none leading-tight">
               No. of Questions
             </span>
             <Stepper
@@ -118,8 +118,8 @@ export function QuestionTypeRow({
           </div>
 
           {/* Marks */}
-          <div className="flex-1 flex flex-col items-center gap-1.5">
-            <span className="text-xs font-sans font-semibold text-[#5E5E5E] select-none">
+          <div className="min-w-0 flex flex-col items-center gap-1.5">
+            <span className="text-center text-xs font-sans font-semibold text-[#5E5E5E] select-none leading-tight">
               Marks
             </span>
             <Stepper

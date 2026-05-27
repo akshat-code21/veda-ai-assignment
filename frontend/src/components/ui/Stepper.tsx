@@ -22,21 +22,21 @@ export function Stepper({ value, onChange, min = 0, max = Infinity }: StepperPro
   }
 
   return (
-    <div className="flex items-center justify-between w-[120px] h-[46px] bg-white rounded-full px-2.5 transition-all select-none">
+    <div className="flex h-[44px] w-full max-w-[120px] min-w-0 items-center justify-between rounded-full bg-white px-1.5 transition-all select-none sm:h-[46px] sm:px-2.5">
       {/* Decrement Button */}
       <Button
         type="button"
         variant="ghost"
         disabled={value <= min}
         onClick={handleDecrement}
-        className="h-8 w-8 p-0 rounded-full hover:bg-gray-50 active:scale-90 text-[#C2C2C2] hover:text-[#5E5E5E] transition-all disabled:opacity-30 disabled:pointer-events-none shrink-0"
+        className="h-8 w-8 shrink-0 rounded-full p-0 text-[#C2C2C2] transition-all hover:bg-gray-50 hover:text-[#5E5E5E] active:scale-90 disabled:pointer-events-none disabled:opacity-30"
         aria-label="Decrement"
       >
         <Minus className="h-4 w-4" strokeWidth={2.5} />
       </Button>
 
       {/* Value Display */}
-      <span className="flex-1 text-center font-heading text-base text-[#303030]">
+      <span className="min-w-5 flex-1 text-center font-heading text-base text-[#303030]">
         {value}
       </span>
 
@@ -46,7 +46,7 @@ export function Stepper({ value, onChange, min = 0, max = Infinity }: StepperPro
         variant="ghost"
         disabled={value >= max}
         onClick={handleIncrement}
-        className="h-8 w-8 p-0 rounded-full hover:bg-gray-50 active:scale-90 text-[#C2C2C2] hover:text-[#5E5E5E] transition-all disabled:opacity-30 disabled:pointer-events-none shrink-0"
+        className="h-8 w-8 shrink-0 rounded-full p-0 text-[#C2C2C2] transition-all hover:bg-gray-50 hover:text-[#5E5E5E] active:scale-90 disabled:pointer-events-none disabled:opacity-30"
         aria-label="Increment"
       >
         <Plus className="h-4 w-4" strokeWidth={2.5} />

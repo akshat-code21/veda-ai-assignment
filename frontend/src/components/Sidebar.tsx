@@ -91,7 +91,7 @@ export function Sidebar({ assignmentsCount = 0, onAddAssignment }: SidebarProps)
           {navItems.map((item) => (
             <a
               key={item.label}
-              href="#"
+              href="/assignments"
               className={`flex items-center gap-2 rounded-lg px-3 py-2 text-base font-heading transition-colors ${item.active
                 ? "bg-[#F0F0F0] font-medium text-[#303030]"
                 : "text-[#5E5E5E]/80 hover:bg-[#F0F0F0]/50"

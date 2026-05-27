@@ -102,7 +102,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext }: CreateA
   }
 
   return (
-    <section className="flex flex-1 flex-col px-4 lg:px-8 pb-10">
+    <section className="flex flex-1 flex-col px-4 pb-8 lg:px-8 lg:pb-10">
       <div className="hidden lg:flex items-center gap-3 mt-4 mb-4">
         <span className="h-[12px] w-[12px] rounded-full bg-[#22C55E] shrink-0" />
         <div className="flex flex-col">
@@ -131,7 +131,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext }: CreateA
         <div className="w-10" />
       </div>
 
-      <div className="px-12 py-8">
+      <div className="px-0 py-2 lg:px-12 lg:py-8">
         <div className="flex gap-2 mb-6">
           <div className="flex-1 h-[4px] rounded-full bg-[#303030]" />
           <div className="flex-1 h-[4px] rounded-full bg-[#D9D9D9]" />
@@ -231,7 +231,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext }: CreateA
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-6 pb-4 lg:pb-0 gap-4">
+        <div className="flex items-center justify-center mt-6 pb-24 lg:pb-0 gap-4">
           <Button
             type="button"
             variant="outline"

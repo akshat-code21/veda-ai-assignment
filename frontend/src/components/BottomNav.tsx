@@ -39,33 +39,33 @@ interface BottomNavProps {
 
 export function BottomNav({ onAddAssignment }: BottomNavProps) {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col items-end gap-3 px-2.5 pb-4 lg:hidden">
-      {/* FAB Button */}
-      <Button
-        type="button"
-        variant="ghost"
-        onClick={onAddAssignment}
-        aria-label="Create new assignment"
-        id="mobile-fab-create"
-        className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)] hover:bg-white/90 hover:scale-105 active:scale-95 p-0"
-      >
-        <Plus className="h-5 w-5 text-[#303030]" />
-      </Button>
+    <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col items-end gap-3 px-2.5 pb-4 mt-4 lg:hidden">
+      {onAddAssignment && (
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={onAddAssignment}
+          aria-label="Create new assignment"
+          id="mobile-fab-create"
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-white p-0 shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)] hover:scale-105 hover:bg-white/90 active:scale-95"
+        >
+          <Plus className="h-5 w-5 text-[#303030]" />
+        </Button>
+      )}
 
       {/* Tab Bar */}
       <nav
-        className="flex w-full items-center justify-between rounded-3xl bg-[#181818] px-6 py-2.5 shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)]"
+        className="flex w-full items-center justify-between rounded-3xl bg-[#181818] px-6 py-4 mt-4 shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)]"
         aria-label="Bottom navigation"
       >
         {tabs.map((tab) => (
           <a
             key={tab.label}
             href="#"
-            className={`flex flex-col items-center gap-1 rounded-[26px] px-2 py-1.5 transition-colors ${
-              tab.active
-                ? "bg-white/10"
-                : "bg-transparent"
-            }`}
+            className={`flex flex-col items-center gap-1 rounded-[26px] px-2 py-1.5 transition-colors ${tab.active
+              ? "bg-white/10"
+              : "bg-transparent"
+              }`}
           >
             <span
               className={
@@ -75,9 +75,8 @@ export function BottomNav({ onAddAssignment }: BottomNavProps) {
               {tab.icon}
             </span>
             <span
-              className={`font-heading text-xs font-semibold leading-[17px] ${
-                tab.active ? "text-white" : "text-white/25"
-              }`}
+              className={`font-heading text-xs font-semibold leading-[17px] ${tab.active ? "text-white" : "text-white/25"
+                }`}
             >
               {tab.label}
             </span>
