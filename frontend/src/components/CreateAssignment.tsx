@@ -132,15 +132,6 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
 
     setErrors({})
 
-    const typeMap: Record<string, string> = {
-      "Multiple Choice Questions": "mcq",
-      "Short Questions": "short",
-      "Long Answer Questions": "long",
-      "True/False Questions": "true_false",
-    }
-    const firstQt = questionTypes[0]
-    const mappedType = typeMap[firstQt?.label] || "mcq"
-
     const newAssignment = {
       _id: "",
       userId: "",
@@ -148,7 +139,11 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
       subject: result.data.subject,
       assignedDate: new Date().toISOString(),
       dueDate: result.data.dueDate,
-      questionTypes: mappedType as Assignment["questionTypes"],
+      questionTypes: questionTypes.map((qt) => ({
+        label: qt.label,
+        numQuestions: qt.numQuestions,
+        marks: qt.marks,
+      })),
       numberOfQuestions: totalQuestions,
       totalMarks,
       additionalInstructions: result.data.additionalInstructions,

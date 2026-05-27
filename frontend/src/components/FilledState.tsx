@@ -10,6 +10,8 @@ import {
 import { Button } from "./ui/button"
 import { useNavigate } from "react-router"
 import type { Assignment } from "@/types/assignment"
+import { format } from "date-fns"
+
 
 interface FilledStateProps {
   assignments: Assignment[]
@@ -140,11 +142,23 @@ export function FilledState({
             <div className="flex items-center justify-between gap-4 text-sm font-sans leading-none mt-auto">
               <div className="flex items-center gap-1.5">
                 <span className="font-bold text-[#303030]">Assigned on :</span>
-                <span className="text-[#5E5E5E]">{assignment.assignedDate}</span>
+                <span className="text-[#5E5E5E]">
+                  {(() => {
+                    if (!assignment.assignedDate) return ""
+                    const d = new Date(assignment.assignedDate)
+                    return isNaN(d.getTime()) ? String(assignment.assignedDate) : format(d, "dd-MM-yyyy")
+                  })()}
+                </span>
               </div>
               <div className="flex items-center gap-1.5 ml-auto lg:ml-0">
                 <span className="font-bold text-[#303030]">Due :</span>
-                <span className="text-[#5E5E5E]">{assignment.dueDate}</span>
+                <span className="text-[#5E5E5E]">
+                  {(() => {
+                    if (!assignment.dueDate) return ""
+                    const d = new Date(assignment.dueDate)
+                    return isNaN(d.getTime()) ? String(assignment.dueDate) : format(d, "dd-MM-yyyy")
+                  })()}
+                </span>
               </div>
             </div>
 

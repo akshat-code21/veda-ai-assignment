@@ -1,10 +1,15 @@
 import { OpenRouter } from "@openrouter/sdk";
+import OpenAI from "openai";
 import { env } from "../config/env";
 import { z } from "zod";
 
 const openrouter = new OpenRouter({
     apiKey: env.OPENROUTER_API_KEY
 });
+
+const openai = new OpenAI({
+    apiKey: env.OPENAI_API_KEY
+})
 
 const QuestionSchema = z.object({
     number: z.number(),
@@ -32,7 +37,7 @@ export interface GenerationInput {
     title: string;
     subject: string;
     dueDate: Date;
-    questionTypes: string;
+    questionTypes: any;
     numberOfQuestions: number;
     totalMarks: number;
     additionalInstructions?: string;
@@ -41,6 +46,13 @@ export interface GenerationInput {
 
 export async function generateQuestions(input: GenerationInput): Promise<GeneratedPaper> {
     const marksPerQuestion = Math.round(input.totalMarks / input.numberOfQuestions);
+
+    let formattedQuestionTypes = input.questionTypes;
+    if (Array.isArray(input.questionTypes)) {
+        formattedQuestionTypes = input.questionTypes
+            .map((qt: any) => `${qt.numQuestions} ${qt.label} (${qt.marks} mark${qt.marks > 1 ? "s" : ""} each)`)
+            .join(", ");
+    }
 
     const systemPrompt = `You are an expert teacher and question paper designer. 
 Your task is to generate a structured question paper in valid JSON format only — no markdown, no explanation, just raw JSON.
@@ -56,7 +68,7 @@ The JSON must strictly match this schema:
           "text": "Question text here",
           "difficulty": "easy" | "medium" | "hard",
           "marks": 2,
-          "type": "mcq" | "short" | "long" | "true_false",
+          "type": "mcq" | "short" | "long" | "true_false" | "diagram" | "numerical" | "other",
           "options": ["A. ...", "B. ...", "C. ...", "D. ..."],  // only for MCQ
           "answer": "Ideal model answer or answer key explanation for this question"
         }
@@ -66,47 +78,79 @@ The JSON must strictly match this schema:
 }
 Always include "options" only for MCQ type questions. Never include it for other types. Always provide an answer in the "answer" field for all questions.`;
 
+    let structureInstruction = "";
+    if (Array.isArray(input.questionTypes)) {
+        const sectionsList = input.questionTypes
+            .map((qt: any, index: number) => {
+                const letter = String.fromCharCode(65 + index);
+                return `- Section ${letter}: Title MUST be exactly "${qt.label}". It MUST contain exactly ${qt.numQuestions} questions, each worth exactly ${qt.marks} mark${qt.marks > 1 ? "s" : ""}. The questions in this section must be of type "${qt.label}".`;
+            })
+            .join("\n");
+
+        structureInstruction = `You MUST organize the question paper into exactly ${input.questionTypes.length} sections in this precise order:
+${sectionsList}
+
+Ensure the number of questions and marks in each section match this specification exactly. Within each section, distribute the questions such that you have a healthy mix of easy, medium, and hard difficulty levels where appropriate.`;
+    } else {
+        structureInstruction = `Organise questions into logical sections (e.g. Section A, Section B) based on difficulty:
+- Easy questions first (~30% of total)
+- Medium questions next (~50% of total)
+- Hard questions last (~20% of total)`;
+    }
+
     const userPrompt = `Generate a question paper with the following requirements:
 
 - Subject: ${input.subject}
 - Title: ${input.title}
-- Question Type: ${input.questionTypes}
+- Question Type: ${formattedQuestionTypes}
 - Total Questions: ${input.numberOfQuestions}
-- Total Marks: ${input.totalMarks} (approx ${marksPerQuestion} marks per question)
+- Total Marks: ${input.totalMarks}${String(formattedQuestionTypes).includes("each") ? " (allocate marks as specified in the Question Type specification below)" : ` (approx ${marksPerQuestion} marks per question)`}
 - Due Date: ${new Date(input.dueDate).toLocaleDateString()}
 ${input.additionalInstructions ? `- Additional Instructions: ${input.additionalInstructions}` : ""}
 
-Organise questions into logical sections (e.g. Section A, Section B) based on difficulty:
-- Easy questions first (~30% of total)
-- Medium questions next (~50% of total)
-- Hard questions last (~20% of total)
+${structureInstruction}
 
 ${input.fileUrl ? "A reference document has been provided. Base questions on its content where possible." : "Generate questions appropriate for the subject and level."}
 
 Return ONLY valid JSON matching the schema. No preamble, no markdown.`;
 
-    const messages: Parameters<typeof openrouter.chat.send>[0]["chatRequest"]["messages"] = [
+    // const messages: Parameters<typeof openrouter.chat.send>[0]["chatRequest"]["messages"] = [
+    //     { role: "system", content: systemPrompt },
+    //     {
+    //         role: "user",
+    //         content: input.fileUrl
+    //             ? [
+    //                 { type: "text" as const, text: userPrompt },
+    //                 { type: "file" as const, file: { fileData: input.fileUrl } },
+    //             ]
+    //             : userPrompt,
+    //     },
+    // ];
+
+    const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
         { role: "system", content: systemPrompt },
         {
             role: "user",
             content: input.fileUrl
-                ? [
-                    { type: "text" as const, text: userPrompt },
-                    { type: "file" as const, file: { fileData: input.fileUrl } },
-                ]
+                ? `${userPrompt}\n\nReference Document URL: ${input.fileUrl}`
                 : userPrompt,
         },
     ];
 
     let response;
     try {
-        response = await openrouter.chat.send({
-            chatRequest: {
-                model: "openai/gpt-oss-120b:free",
-                messages,
-                responseFormat: { type: "json_object" },
-            }
-        });
+        // response = await openrouter.chat.send({
+        //     chatRequest: {
+        //         model: "z-ai/glm-5",
+        //         messages,
+        //         responseFormat: { type: "json_object" },
+        //     }
+        // });
+        response = await openai.chat.completions.create({
+            model: "gpt-5.4-nano",
+            messages,
+            response_format: { "type": "json_object" }
+        })
     } catch (err: any) {
         if (err.name === "ResponseValidationError") {
             console.error("\nOpenRouter ResponseValidationError:\n", err.pretty ? err.pretty() : err);

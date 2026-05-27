@@ -65,3 +65,11 @@ export async function getPresignedUrl(s3Url: string): Promise<string> {
         return s3Url;
     }
 }
+
+export async function getCloudFrontUrl(s3Url: string) {
+    if (!s3Url) return s3Url;
+    const key = getS3KeyFromUrl(s3Url);
+    if (!key) return s3Url;
+    const filename = key.split("/").pop();
+    return `${env.CLOUDFRONT_DOMAIN}/${filename}`;
+}

@@ -67,7 +67,7 @@ export async function generatePdfBuffer(
             doc.moveDown(0.2);
 
             const titleClassMatch = title.match(/class\s*:\s*([^\s]+)/i) || title.match(/class\s+([^\s]+)/i);
-            const classText = titleClassMatch ? `Class: ${titleClassMatch[1]}` : "Class: 5th";
+            const classText = titleClassMatch ? `Class: ${titleClassMatch[1]}` : "";
             doc.fontSize(12).font("Inter-Bold").text(classText, { align: "center" });
             doc.moveDown(1);
 

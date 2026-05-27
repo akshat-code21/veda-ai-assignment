@@ -18,19 +18,22 @@ export function CreateAssignmentPage() {
       formData.append("subject", assignment.subject || "General")
       formData.append("dueDate", assignment.dueDate || new Date().toISOString())
       formData.append("assignedDate", assignment.assignedDate || new Date().toISOString())
-      formData.append("questionTypes", assignment.questionTypes || "mcq")
+      const questionTypesValue = typeof assignment.questionTypes === "string"
+        ? assignment.questionTypes
+        : JSON.stringify(assignment.questionTypes || [])
+      formData.append("questionTypes", questionTypesValue)
       formData.append("numberOfQuestions", String(assignment.numberOfQuestions || 10))
       formData.append("totalMarks", String(assignment.totalMarks || 50))
       if (assignment.additionalInstructions) {
         formData.append("additionalInstructions", assignment.additionalInstructions)
       }
       if (file) {
-        formData.append("file", file)
+        formData.append("source_file", file)
       }
 
-      await assignmentApi.create(formData)
+      const created = await assignmentApi.create(formData)
       toast.success("Assignment created! Generation will begin shortly.")
-      navigate("/assignments")
+      navigate(`/assignments/${created._id}`)
     } catch (err) {
       console.error("Failed to create assignment:", err)
       toast.error("Failed to create assignment. Please try again.")

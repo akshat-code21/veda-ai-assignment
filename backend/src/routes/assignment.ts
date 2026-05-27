@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { AssignmentModel } from "../models/assignment";
-import { getPresignedUrl, uploadFile } from "../services/s3.service";
+import { getCloudFrontUrl, uploadFile } from "../services/s3.service";
 import { addJob } from "../queues/generation.queue";
 import { uploadMiddleware } from "../middleware/upload.middleware";
 
@@ -18,13 +18,33 @@ assignmentRouter.post("/", uploadMiddleware, async (req, res) => {
 
     const { title, subject, assignedDate, dueDate, questionTypes, numberOfQuestions, totalMarks, additionalInstructions } = req.body;
 
+    const parseDateString = (dateStr: any): Date | undefined => {
+        if (!dateStr) return undefined;
+        const match = String(dateStr).match(/^(\d{2})-(\d{2})-(\d{4})$/);
+        if (match) {
+            const [, day, month, year] = match;
+            return new Date(Number(year), Number(month) - 1, Number(day));
+        }
+        const parsed = new Date(dateStr);
+        return isNaN(parsed.getTime()) ? undefined : parsed;
+    };
+
+    let parsedQuestionTypes = questionTypes;
+    if (typeof questionTypes === "string") {
+        try {
+            parsedQuestionTypes = JSON.parse(questionTypes);
+        } catch {
+            parsedQuestionTypes = questionTypes;
+        }
+    }
+
     const assignment = new AssignmentModel({
         userId: res.locals.session.session.userId,
         title,
         subject,
-        dueDate,
-        assignedDate,
-        questionTypes,
+        dueDate: parseDateString(dueDate),
+        assignedDate: parseDateString(assignedDate),
+        questionTypes: parsedQuestionTypes,
         numberOfQuestions,
         totalMarks,
         additionalInstructions,
@@ -50,24 +70,23 @@ assignmentRouter.post("/", uploadMiddleware, async (req, res) => {
 
     const responseData = assignment.toObject();
     if (responseData.fileUrl) {
-        responseData.fileUrl = await getPresignedUrl(responseData.fileUrl);
+        responseData.fileUrl = await getCloudFrontUrl(responseData.fileUrl);
     }
     res.status(201).json(responseData);
 });
 
 
 assignmentRouter.get("/", async (req, res) => {
-    console.log(res.locals.session.session);
     const { userId } = res.locals.session.session
     const assignments = await AssignmentModel.find({ userId }).lean();
 
     const signedAssignments = await Promise.all(
         assignments.map(async (assignment) => {
             if (assignment.fileUrl) {
-                assignment.fileUrl = await getPresignedUrl(assignment.fileUrl);
+                assignment.fileUrl = await getCloudFrontUrl(assignment.fileUrl);
             }
             if (assignment.pdfUrl) {
-                assignment.pdfUrl = await getPresignedUrl(assignment.pdfUrl);
+                assignment.pdfUrl = await getCloudFrontUrl(assignment.pdfUrl);
             }
             return assignment;
         })
@@ -87,10 +106,10 @@ assignmentRouter.get("/:id", async (req, res) => {
     }
 
     if (assignment.fileUrl) {
-        assignment.fileUrl = await getPresignedUrl(assignment.fileUrl);
+        assignment.fileUrl = await getCloudFrontUrl(assignment.fileUrl);
     }
     if (assignment.pdfUrl) {
-        assignment.pdfUrl = await getPresignedUrl(assignment.pdfUrl);
+        assignment.pdfUrl = await getCloudFrontUrl(assignment.pdfUrl);
     }
 
     return res.status(200).json(assignment);

@@ -21,6 +21,10 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 app.use(express.json());
 app.use("/api/assignments", assignmentRouter);
 
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error(`[Error Handler] Error occurred:`, err.message);
+    res.status(err.status || 400).json({ error: err.message || "An unexpected error occurred" });
+});
 
 const server = http.createServer(app);
 createWsServer(server);

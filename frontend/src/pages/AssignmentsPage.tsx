@@ -5,7 +5,6 @@ import { FilledState } from "@/components/FilledState"
 import { EmptyState } from "@/components/EmptyState"
 import { useAssignmentStore } from "@/store/useAssignmentStore"
 import { assignmentApi } from "@/lib/api"
-import { useWebSocket } from "@/hooks/use-websocket"
 
 export function AssignmentsPage() {
   const navigate = useNavigate()
@@ -23,8 +22,6 @@ export function AssignmentsPage() {
       setAssignments(data)
     }
   }, [data, setAssignments])
-
-  useWebSocket()
 
   if (isLoading) {
     return (

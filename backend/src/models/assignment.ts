@@ -6,7 +6,7 @@ const AssignmentSchema = new mongoose.Schema({
     subject: { type: String },
     assignedDate: { type: Date, default: Date.now },
     dueDate: { type: Date },
-    questionTypes: { type: String, enum: ["mcq", "short", "long", "true_false"], default: "mcq" },
+    questionTypes: { type: mongoose.Schema.Types.Mixed, default: "mcq" },
     numberOfQuestions: { type: Number },
     totalMarks: { type: Number },
     additionalInstructions: { type: String },

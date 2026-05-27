@@ -6,13 +6,19 @@ const queue = new Queue("question-generation", {
     connection: redis
 });
 
+export interface QuestionTypeConfig {
+    label: string;
+    numQuestions: number;
+    marks: number;
+}
+
 export interface JobPayload {
     userId: string;
     title: string;
     subject: string;
     assignedDate: Date;
     dueDate: Date;
-    questionTypes: "mcq" | "short" | "long" | "true_false";
+    questionTypes: QuestionTypeConfig[] | string;
     numberOfQuestions: number;
     totalMarks: number;
     additionalInstructions?: string;

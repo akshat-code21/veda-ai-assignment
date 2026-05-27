@@ -26,10 +26,11 @@ export function FileUpload({ file, onChange }: FileUploadProps) {
   const validateAndSetFile = (selectedFile: File) => {
     setError(null)
 
-    // Check type: JPEG or PNG
-    const validTypes = ["image/jpeg", "image/png", "image/jpg"]
-    if (!validTypes.includes(selectedFile.type)) {
-      setError("Only JPEG and PNG files are supported.")
+    const ext = selectedFile.name.substring(selectedFile.name.lastIndexOf('.')).toLowerCase()
+    const allowedExtensions = ['.pdf', '.txt', '.doc', '.docx']
+
+    if (!allowedExtensions.includes(ext)) {
+      setError("Only PDF, TXT, DOC, and DOCX files are supported.")
       return
     }
 
@@ -41,13 +42,7 @@ export function FileUpload({ file, onChange }: FileUploadProps) {
     }
 
     onChange(selectedFile)
-
-    // Generate image preview
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      setPreviewUrl(reader.result as string)
-    }
-    reader.readAsDataURL(selectedFile)
+    setPreviewUrl(null) // Document files do not get an image preview
   }
 
   const handleDrop = (e: React.DragEvent) => {
@@ -95,7 +90,7 @@ export function FileUpload({ file, onChange }: FileUploadProps) {
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
-        accept="image/png, image/jpeg, image/jpg"
+        accept=".pdf,.txt,.doc,.docx"
         className="hidden"
       />
 
@@ -114,17 +109,12 @@ export function FileUpload({ file, onChange }: FileUploadProps) {
       >
         {file ? (
           <div className="flex flex-col items-center gap-3 w-full max-w-md">
-            {previewUrl ? (
-              <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-[#D9D9D9] shadow-sm bg-white shrink-0">
-                <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
-              </div>
-            ) : (
+            <div className="relative w-20 h-20 flex items-center justify-center rounded-xl overflow-hidden border border-[#D9D9D9] shadow-sm bg-[#F9F9F9] shrink-0">
               <FileText className="h-10 w-10 text-[#5E5E5E]" />
-            )}
+            </div>
 
             <div className="text-center w-full min-w-0">
               <div className="flex items-center justify-center gap-1.5 text-sm font-semibold text-[#303030]">
-                <CheckCircle className="h-4 w-4 text-[#22C55E]" />
                 <span className="truncate max-w-[240px]">{file.name}</span>
               </div>
               <p className="text-xs text-[#5E5E5E] mt-0.5">{formatFileSize(file.size)}</p>
@@ -147,7 +137,7 @@ export function FileUpload({ file, onChange }: FileUploadProps) {
               Choose a file or drag & drop it here
             </p>
             <p className="font-sans font-extralight text-sm text-[#A9A9A9] text-center">
-              JPEG, PNG, up to 10MB
+              PDF, TXT, DOC, DOCX, up to 10MB
             </p>
             <Button
               type="button"
@@ -168,7 +158,7 @@ export function FileUpload({ file, onChange }: FileUploadProps) {
       )}
 
       <p className="text-sm text-[#5E5E5E] mt-3 text-center font-sans">
-        Upload images of your preferred document/image
+        Upload documents (PDF, TXT, DOC, DOCX) of your preferred material
       </p>
     </div>
   )

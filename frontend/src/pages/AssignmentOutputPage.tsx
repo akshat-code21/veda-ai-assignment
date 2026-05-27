@@ -1,11 +1,14 @@
 import { useNavigate, useParams } from "react-router"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { AssignmentOutput } from "@/components/AssignmentOutput"
 import { assignmentApi } from "@/lib/api"
+import { useWebSocket } from "@/hooks/use-websocket"
+import { useCallback } from "react"
 
 export function AssignmentOutputPage() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { id } = useParams<{ id: string }>()
 
   const { data: assignment, isLoading, error } = useQuery({
@@ -19,11 +22,30 @@ export function AssignmentOutputPage() {
     },
   })
 
+  const isProcessing = assignment?.status === "pending" || assignment?.status === "processing"
+
+  const handleWsStatusChange = useCallback((type: string) => {
+    if (type === "assignment:completed" || type === "assignment:failed") {
+      queryClient.invalidateQueries({ queryKey: ["assignment", id] })
+      queryClient.invalidateQueries({ queryKey: ["assignments"] })
+    }
+    if (type === "assignment:processing") {
+      queryClient.invalidateQueries({ queryKey: ["assignment", id] })
+    }
+  }, [id, queryClient])
+
+  useWebSocket({
+    assignmentId: id || "",
+    enabled: isProcessing,
+    onStatusChange: handleWsStatusChange,
+  })
+
   const handleRegenerate = async () => {
     if (!id) return
     try {
       await assignmentApi.regenerate(id)
       toast.success("Regeneration started! This may take a moment...")
+      queryClient.invalidateQueries({ queryKey: ["assignment", id] })
     } catch {
       toast.error("Failed to regenerate. Please try again.")
     }

@@ -1,3 +1,9 @@
+export interface QuestionTypeConfig {
+    label: string;
+    numQuestions: number;
+    marks: number;
+}
+
 export interface Assignment {
     _id: string;
     userId: string;
@@ -5,7 +11,7 @@ export interface Assignment {
     subject: string;
     assignedDate: string;
     dueDate: string;            // ISO date string
-    questionTypes: "mcq" | "short" | "long" | "true_false";
+    questionTypes: QuestionTypeConfig[] | string;
     numberOfQuestions: number;
     totalMarks: number;
     additionalInstructions?: string;

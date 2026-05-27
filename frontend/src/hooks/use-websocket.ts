@@ -1,95 +1,88 @@
-import { useEffect, useState, useRef } from "react"
-import { useAssignmentStore } from "@/store/useAssignmentStore"
-import { api } from "@/lib/api"
-import type { Assignment } from "@/types/assignment"
+import { useEffect, useRef, useCallback } from "react"
+import { authClient } from "@/lib/auth-client"
 
-export function useWebSocket() {
-    const assignments = useAssignmentStore((s) => s.assignments)
-    const setAssignments = useAssignmentStore((s) => s.setAssignments)
-    const updateAssignmentStatus = useAssignmentStore((s) => s.updateAssignmentStatus)
+interface UseWebSocketOptions {
+    assignmentId: string
+    enabled?: boolean
+    onStatusChange?: (status: string, payload: Record<string, any>) => void
+}
 
+export function useWebSocket({ assignmentId, enabled = true, onStatusChange }: UseWebSocketOptions) {
     const wsRef = useRef<WebSocket | null>(null)
-    const [connected, setConnected] = useState(false)
-    const [error, setError] = useState<Error | null>(null)
-    const reconnectTimeoutRef = useRef<number | null>(null)
+    const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const onStatusChangeRef = useRef(onStatusChange)
+    onStatusChangeRef.current = onStatusChange
+
+    const cleanup = useCallback(() => {
+        if (reconnectTimeoutRef.current) {
+            clearTimeout(reconnectTimeoutRef.current)
+            reconnectTimeoutRef.current = null
+        }
+        if (wsRef.current) {
+            wsRef.current.close()
+            wsRef.current = null
+        }
+    }, [])
 
     useEffect(() => {
+        if (!enabled || !assignmentId) {
+            cleanup()
+            return
+        }
 
         const wsUrl = import.meta.env.VITE_WS_URL
 
-        function connect() {
+        async function connect() {
             if (wsRef.current) return
 
-            const ws = new WebSocket(wsUrl)
+            const session = await authClient.getSession()
+            const token = session.data?.session?.token
+            if (!token) {
+                console.error("No session token available for WebSocket")
+                return
+            }
+
+            const ws = new WebSocket(`${wsUrl}?token=${token}`)
             wsRef.current = ws
 
             ws.onopen = () => {
-                console.log("WebSocket connected")
-                setConnected(true)
-                setError(null)
+                console.log(`[WS] Connected for assignment ${assignmentId}`)
             }
 
-            ws.onmessage = async (event) => {
+            ws.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data)
-                    console.log("WebSocket message received:", data)
-
-                    if (data.type === "assignment_updated" || data.type?.startsWith("assignment:")) {
-                        const assignmentId = data.assignmentId || data.payload?.assignmentId
-
-                        if (assignmentId) {
-                            try {
-                                const response = await api.get<Assignment>(`/api/assignments/${assignmentId}`)
-                                const updatedAssignment = response.data
-
-                                // Update assignments list in store
-                                const exists = assignments.some((a) => a._id === assignmentId)
-                                if (exists) {
-                                    setAssignments(
-                                        assignments.map((a) => (a._id === assignmentId ? updatedAssignment : a))
-                                    )
-                                } else {
-                                    setAssignments([updatedAssignment, ...assignments])
-                                }
-                            } catch (err) {
-                                console.error("Failed to fetch updated assignment:", err)
-                            }
-                        }
+                    if (data.payload?.assignmentId === assignmentId) {
+                        console.log(`[WS] Event for ${assignmentId}:`, data.type)
+                        onStatusChangeRef.current?.(data.type, data.payload)
                     }
                 } catch (e) {
-                    console.error("Error parsing WebSocket message:", e)
+                    console.error("[WS] Error parsing message:", e)
                 }
             }
 
-            ws.onerror = (err) => {
-                console.error("WebSocket error:", err)
-                setError(new Error("WebSocket connection failed"))
+            ws.onerror = () => {
+                console.error("[WS] Connection error")
             }
 
             ws.onclose = (event) => {
-                console.log("WebSocket disconnected:", event.code, event.reason)
-                setConnected(false)
                 wsRef.current = null
 
-                reconnectTimeoutRef.current = setTimeout(() => {
-                    console.log("Attempting WebSocket reconnect...")
-                    connect()
-                }, 3000)
+                if (event.code === 1011 || event.code === 1008) {
+                    console.error(`[WS] Auth failed (${event.code}): ${event.reason}`)
+                    return
+                }
+
+                if (enabled) {
+                    reconnectTimeoutRef.current = setTimeout(() => {
+                        connect()
+                    }, 5000)
+                }
             }
         }
 
         connect()
 
-        return () => {
-            if (wsRef.current) {
-                wsRef.current.close()
-                wsRef.current = null
-            }
-            if (reconnectTimeoutRef.current) {
-                clearTimeout(reconnectTimeoutRef.current)
-            }
-        }
-    }, [assignments, setAssignments, updateAssignmentStatus])
-
-    return { connected, error, ws: wsRef.current }
+        return cleanup
+    }, [assignmentId, enabled, cleanup])
 }

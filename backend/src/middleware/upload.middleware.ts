@@ -6,26 +6,30 @@ import path from 'path';
 const storage = multer.memoryStorage();
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-    console.log(`[Upload Middleware] Received file: "${file.originalname}", MIME: "${file.mimetype}"`);
+    try {
+        console.log(`[Upload Middleware] Received file: "${file.originalname}", MIME: "${file.mimetype}"`);
 
-    const allowedMimeTypes = [
-        'application/pdf',
-        'text/plain',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/octet-stream'
-    ];
+        const allowedMimeTypes = [
+            'application/pdf',
+            'text/plain',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/octet-stream'
+        ];
 
-    const allowedExtensions = /\.(pdf|txt|doc|docx)$/i;
+        const allowedExtensions = /\.(pdf|txt|doc|docx)$/i;
 
-    const ext = path.extname(file.originalname).toLowerCase();
-    const isMimeValid = allowedMimeTypes.includes(file.mimetype) || !file.mimetype;
-    const isExtValid = allowedExtensions.test(ext);
+        const ext = path.extname(file.originalname).toLowerCase();
+        const isMimeValid = allowedMimeTypes.includes(file.mimetype) || !file.mimetype;
+        const isExtValid = allowedExtensions.test(ext);
 
-    if (isMimeValid && isExtValid) {
-        cb(null, true);
-    } else {
-        cb(new Error(`Invalid file type! Only PDF, TXT, DOC, and DOCX are allowed.`));
+        if (isMimeValid && isExtValid) {
+            cb(null, true);
+        } else {
+            cb(new Error(`Invalid file type! Only PDF, TXT, DOC, and DOCX are allowed.`));
+        }
+    } catch (error) {
+        console.error(error)
     }
 };
 
