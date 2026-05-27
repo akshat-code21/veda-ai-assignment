@@ -8,13 +8,8 @@ import {
   Funnel
 } from "lucide-react"
 import { Button } from "./ui/button"
-
-export interface Assignment {
-  id: string
-  title: string
-  assignedDate: string
-  dueDate: string
-}
+import { useNavigate } from "react-router"
+import type { Assignment } from "@/types/assignment"
 
 interface FilledStateProps {
   assignments: Assignment[]
@@ -27,6 +22,7 @@ export function FilledState({
   onDeleteAssignment,
   onAddAssignment,
 }: FilledStateProps) {
+  const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState("")
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null)
   const menuRef = useRef<HTMLDivElement | null>(null)
@@ -118,7 +114,8 @@ export function FilledState({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 flex-1 pb-20">
         {filteredAssignments.map((assignment) => (
           <div
-            key={assignment.id}
+            key={assignment._id}
+            onClick={() => navigate(`/assignments/${assignment._id}`)}
             className="cursor-pointer relative bg-white rounded-2xl p-5 shadow-[0px_4px_24px_rgba(0,0,0,0.02)] hover:translate-y-[-2px] hover:shadow-[0px_8px_24px_rgba(0,0,0,0.06)] transition-all duration-200 flex flex-col justify-between h-[134px] lg:h-[142px] overflow-visible"
           >
             {/* Title & Three-dots */}
@@ -132,7 +129,7 @@ export function FilledState({
                 className="h-8 w-8 p-0 rounded-full hover:bg-gray-100 shrink-0"
                 onClick={(e) => {
                   e.stopPropagation()
-                  setActiveMenuId(activeMenuId === assignment.id ? null : assignment.id)
+                  setActiveMenuId(activeMenuId === assignment._id ? null : assignment._id)
                 }}
               >
                 <MoreVertical className="h-5 w-5 text-[#5E5E5E]" />
@@ -152,7 +149,7 @@ export function FilledState({
             </div>
 
             {/* Popover Dropdown Menu */}
-            {activeMenuId === assignment.id && (
+            {activeMenuId === assignment._id && (
               <div
                 ref={menuRef}
                 className="absolute right-4 top-14 w-[160px] bg-white rounded-xl shadow-[0px_8px_32px_rgba(0,0,0,0.15)] border border-gray-100 py-1.5 z-40 animate-in fade-in slide-in-from-top-2 duration-150"
@@ -163,7 +160,7 @@ export function FilledState({
                   className="w-full px-4 py-2 h-auto rounded-none text-left text-sm font-sans text-[#303030] hover:bg-[#F0F0F0] justify-start"
                   onClick={() => {
                     setActiveMenuId(null)
-                    alert(`Viewing details for: ${assignment.title}`)
+                    navigate(`/assignments/${assignment._id}`)
                   }}
                 >
                   View Assignment
@@ -174,7 +171,7 @@ export function FilledState({
                   className="w-full px-4 py-2 h-auto rounded-none text-left text-sm font-sans text-red-500 hover:bg-[#FFF1F0] hover:text-red-500 justify-start font-medium"
                   onClick={() => {
                     setActiveMenuId(null)
-                    onDeleteAssignment(assignment.id)
+                    onDeleteAssignment(assignment._id)
                   }}
                 >
                   Delete

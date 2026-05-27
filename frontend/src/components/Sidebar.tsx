@@ -6,7 +6,9 @@ import {
   Book,
   ChartPie,
 } from "lucide-react"
+import { Link } from "react-router"
 import { Button } from "./ui/button"
+import { authClient } from "@/lib/auth-client"
 
 interface NavItem {
   label: string
@@ -44,6 +46,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ assignmentsCount = 0, onAddAssignment }: SidebarProps) {
+  const { data: session } = authClient.useSession()
+  const userName = session?.user?.name || "User"
   return (
     <aside className="hidden lg:flex h-[calc(100svh-24px)] w-[304px] min-w-[304px] flex-col justify-between rounded-2xl bg-white shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)]">
       {/* Top section */}
@@ -89,9 +93,9 @@ export function Sidebar({ assignmentsCount = 0, onAddAssignment }: SidebarProps)
           aria-label="Main navigation"
         >
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.label}
-              href="/assignments"
+              to="/assignments"
               className={`flex items-center gap-2 rounded-lg px-3 py-2 text-base font-heading transition-colors ${item.active
                 ? "bg-[#F0F0F0] font-medium text-[#303030]"
                 : "text-[#5E5E5E]/80 hover:bg-[#F0F0F0]/50"
@@ -110,7 +114,7 @@ export function Sidebar({ assignmentsCount = 0, onAddAssignment }: SidebarProps)
                   {assignmentsCount}
                 </span>
               )}
-            </a>
+            </Link>
           ))}
         </nav>
       </div>
@@ -135,10 +139,10 @@ export function Sidebar({ assignmentsCount = 0, onAddAssignment }: SidebarProps)
           />
           <div className="flex flex-col">
             <span className="font-heading text-base font-bold leading-[22px] text-[#303030]">
-              Delhi Public School
+              {userName}
             </span>
             <span className="font-heading text-sm leading-5 text-[#5E5E5E]">
-              Bokaro Steel City
+              {session?.user?.email || ""}
             </span>
           </div>
         </div>

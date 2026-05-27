@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react"
 import { PDFViewer, ZoomMode } from "@embedpdf/react-pdf-viewer"
-import { Download } from "lucide-react"
+import { Download, RefreshCw } from "lucide-react"
 
 interface AssignmentOutputProps {
   onBack: () => void
   pdfUrl: string
+  title?: string
+  subject?: string
+  onRegenerate?: () => void
 }
 
 const DISABLED_CATEGORIES = [
@@ -32,7 +35,7 @@ const DISABLED_CATEGORIES = [
   "panel-comment",
 ]
 
-export function AssignmentOutput({ onBack: _onBack, pdfUrl }: AssignmentOutputProps) {
+export function AssignmentOutput({ onBack: _onBack, pdfUrl, title, subject, onRegenerate }: AssignmentOutputProps) {
   const [ready, setReady] = useState(false)
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
@@ -71,18 +74,32 @@ export function AssignmentOutput({ onBack: _onBack, pdfUrl }: AssignmentOutputPr
             style={{ backgroundColor: "rgba(24, 24, 24, 0.8)" }}
           >
             <p className="font-heading text-[20px] font-bold leading-[28px] text-white">
-              Certainly, Lakshya! Here are customized Question Paper for your
-              CBSE Grade 8 Science classes on the NCERT chapters:
+              {title && subject
+                ? `Here is your generated question paper for ${subject}: ${title}`
+                : "Here is your generated question paper:"}
             </p>
-            <button
-              onClick={handleDownload}
-              className="flex items-center gap-1 self-start h-[44px] px-6 rounded-full bg-white hover:bg-gray-50 transition-colors cursor-pointer"
-            >
-              <Download className="h-5 w-5 text-[#303030]" />
-              <span className="font-heading text-base font-medium text-[#303030] leading-[22px]">
-                Download as PDF
-              </span>
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleDownload}
+                className="flex items-center gap-1 self-start h-[44px] px-6 rounded-full bg-white hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <Download className="h-5 w-5 text-[#303030]" />
+                <span className="font-heading text-base font-medium text-[#303030] leading-[22px]">
+                  Download as PDF
+                </span>
+              </button>
+              {onRegenerate && (
+                <button
+                  onClick={onRegenerate}
+                  className="flex items-center gap-1 self-start h-[44px] px-6 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
+                >
+                  <RefreshCw className="h-5 w-5 text-white" />
+                  <span className="font-heading text-base font-medium text-white leading-[22px]">
+                    Regenerate
+                  </span>
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="rounded-[32px] bg-white overflow-hidden">
@@ -103,8 +120,9 @@ export function AssignmentOutput({ onBack: _onBack, pdfUrl }: AssignmentOutputPr
             style={{ backgroundColor: "#303030" }}
           >
             <p className="font-heading text-[14px] font-bold leading-[17px] text-[#F0F0F0]">
-              Certainly, Lakshya! Here are customized Question Paper for your
-              CBSE Grade 8 Science classes on the NCERT chapters:
+              {title && subject
+                ? `${subject}: ${title}`
+                : "Your generated question paper"}
             </p>
             <button
               onClick={handleDownload}

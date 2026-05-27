@@ -1,0 +1,219 @@
+# VedaAI – AI Assessment Creator
+
+An AI-powered assessment platform that lets teachers create assignments, generate structured question papers using LLMs, and view/download the output as formatted PDFs — all in real time.
+
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)
+![Express](https://img.shields.io/badge/Express-5-000?logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-Cloud-DC382D?logo=redis&logoColor=white)
+![BullMQ](https://img.shields.io/badge/BullMQ-Queue-FF6600)
+
+---
+
+## Features
+
+- **Assignment Creation** — Form with title, subject, due date, question types (MCQ, short, long, true/false), configurable question counts & marks, file upload (PDF/text), and additional instructions
+- **Zod Validation** — Frontend form validated with Zod schemas; no empty or negative values allowed
+- **AI Question Generation** — Structured prompts sent to OpenRouter LLM (`gpt-oss-120b`); output validated with Zod schemas into sections with difficulty tags
+- **PDF Generation** — Server-side PDF creation with PDFKit (Inter font, student info section, sections, difficulty badges, answer key)
+- **Real-Time Updates** — WebSocket notifications push status changes (pending → processing → completed/failed) to the frontend instantly
+- **Background Processing** — BullMQ job queue with Redis for async generation; 3 retry attempts with exponential backoff
+- **Authentication** — Better Auth with email/password; session cookies; protected + public-only route guards
+- **File Upload** — Multer → AWS S3 pipeline with presigned URL downloads
+- **PDF Viewer** — In-browser PDF rendering with `@embedpdf/react-pdf-viewer`; download & regenerate buttons
+- **Mobile Responsive** — Fully responsive UI with separate mobile/desktop layouts
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Frontend (React + Vite + Tailwind + Shadcn)               │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌───────────┐  │
+│  │  Login/  │  │Dashboard │  │ Create   │  │  Output   │  │
+│  │ Register │  │  (List)  │  │Assignment│  │  (PDF)    │  │
+│  └──────────┘  └──────────┘  └──────────┘  └───────────┘  │
+│       ↕ Axios + Cookies          ↕ WebSocket               │
+└─────────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Backend (Node.js + Express + TypeScript)                   │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌───────────┐  │
+│  │  Better  │  │  REST    │  │  BullMQ  │  │ WebSocket │  │
+│  │  Auth    │  │  API     │  │  Queue   │  │  Server   │  │
+│  └──────────┘  └──────────┘  └──────────┘  └───────────┘  │
+│       │              │              │              │        │
+│       ▼              ▼              ▼              │        │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────┐    │        │
+│  │ MongoDB  │  │ AWS S3   │  │  Worker      │    │        │
+│  │ Atlas    │  │ (files)  │  │  ├─ LLM Call  │───┘        │
+│  └──────────┘  └──────────┘  │  ├─ PDF Gen   │            │
+│                              │  └─ S3 Upload │            │
+│                              └──────────────┘            │
+│                                     │                      │
+│                              ┌──────────┐                  │
+│                              │  Redis   │                  │
+│                              │ (Queue)  │                  │
+│                              └──────────┘                  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Data Flow
+
+1. Teacher submits assignment form → `POST /api/assignments` (multipart)
+2. Backend uploads file to S3 (if attached), saves assignment to MongoDB (status: `pending`)
+3. BullMQ job enqueued → WebSocket broadcasts `assignment:processing`
+4. Worker calls OpenRouter LLM → validates JSON with Zod → generates PDF with PDFKit → uploads to S3
+5. Assignment updated (status: `completed`, `pdfUrl` set) → WebSocket broadcasts `assignment:completed`
+6. Frontend auto-polls / receives WebSocket event → renders PDF in viewer
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React 19, Vite, TypeScript, Tailwind CSS v4, Shadcn/UI |
+| **State** | Zustand, TanStack React Query |
+| **Auth** | Better Auth (email/password, session cookies) |
+| **Validation** | Zod (frontend forms + LLM output parsing) |
+| **Backend** | Node.js, Express 5, TypeScript, Bun runtime |
+| **Database** | MongoDB Atlas (Mongoose ODM) |
+| **Cache/Queue** | Redis (IORedis) + BullMQ |
+| **AI** | OpenRouter (`gpt-oss-120b`) |
+| **Storage** | AWS S3 (file uploads + generated PDFs) |
+| **PDF** | PDFKit (server-side generation) |
+| **WebSocket** | `ws` library (real-time status updates) |
+| **Notifications** | Sonner (toast notifications) |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- [Bun](https://bun.sh/) (v1.1+)
+- [Docker](https://docker.com/) (for local Redis) — or a Redis Cloud account
+- MongoDB Atlas cluster
+- AWS S3 bucket
+- OpenRouter API key
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/your-username/veda-ai.git
+cd veda-ai
+```
+
+### 2. Start Redis (local)
+
+```bash
+docker run -d --name veda-redis -p 6379:6379 redis:7-alpine
+```
+
+### 3. Backend setup
+
+```bash
+cd backend
+bun install
+```
+
+Create `backend/.env`:
+
+```env
+MONGODB_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/<db>
+BETTER_AUTH_SECRET=<openssl rand -base64 32>
+BETTER_AUTH_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:5173
+
+REDIS_URL=redis://localhost:6379
+
+OPENROUTER_API_KEY=sk-or-...
+
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION=ap-south-1
+S3_BUCKET_NAME=veda-ai-uploads
+```
+
+Start the dev server:
+
+```bash
+bun run dev
+# Server starts on http://localhost:3000
+```
+
+### 4. Frontend setup
+
+```bash
+cd frontend
+bun install
+```
+
+Create `frontend/.env`:
+
+```env
+VITE_API_URL=http://localhost:3000
+VITE_WS_URL=ws://localhost:3000
+```
+
+Start the dev server:
+
+```bash
+bun run dev
+# App starts on http://localhost:5173
+```
+
+### 5. Use the app
+
+1. Open `http://localhost:5173` → Register a new account
+2. Create an assignment (fill in title, subject, due date, question types)
+3. Wait for the AI to generate your question paper (real-time status via WebSocket)
+4. View the generated PDF, download it, or regenerate
+
+---
+
+## Project Structure
+
+```
+veda-ai/
+├── frontend/
+│   └── src/
+│       ├── components/       # UI components (Sidebar, TopBar, FilledState, etc.)
+│       ├── pages/            # Route pages (Login, Register, Assignments, Create, Output)
+│       ├── lib/              # API client, auth client, utilities
+│       ├── store/            # Zustand store (assignment state)
+│       ├── hooks/            # Custom hooks (WebSocket)
+│       └── types/            # TypeScript types
+│
+├── backend/
+│   └── src/
+│       ├── config/           # DB, Redis, S3, env validation
+│       ├── lib/              # Better Auth instance
+│       ├── middleware/       # Auth guard, Multer file upload
+│       ├── models/           # Mongoose schemas
+│       ├── routes/           # Express REST endpoints
+│       ├── queues/           # BullMQ queue definition
+│       ├── workers/          # Background job processor
+│       ├── services/         # LLM, PDF generation, S3
+│       └── websocket/        # WebSocket server + broadcast
+│
+└── instructions.md           # Assignment brief
+```
+
+---
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/assignments` | Create assignment (multipart form + optional file) |
+| `GET` | `/api/assignments` | List all assignments for current user |
+| `GET` | `/api/assignments/:id` | Get single assignment with generated paper |
+| `POST` | `/api/assignments/:id/regenerate` | Re-enqueue generation job |
+| `*` | `/api/auth/*` | Better Auth endpoints (sign-in, sign-up, sign-out, session) |
+
+---

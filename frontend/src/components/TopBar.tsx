@@ -1,7 +1,18 @@
 import { Bell, ChevronDown, LayoutGrid, Menu } from "lucide-react"
+import { useNavigate } from "react-router"
 import { Button } from "./ui/button"
+import { authClient } from "@/lib/auth-client"
 
 export function TopBar() {
+  const navigate = useNavigate()
+  const { data: session } = authClient.useSession()
+  const userName = session?.user?.name || "User"
+
+  const handleSignOut = async () => {
+    await authClient.signOut()
+    navigate("/login")
+  }
+
   return (
     <header className="w-full">
       <div className="hidden lg:flex items-center justify-between rounded-2xl bg-white/75 px-6 py-1.5 backdrop-blur-sm">
@@ -11,6 +22,7 @@ export function TopBar() {
             variant="ghost"
             aria-label="Go back"
             id="topbar-back-btn"
+            onClick={() => navigate(-1)}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-white hover:bg-gray-50 p-0 shadow-none"
           >
             <svg
@@ -54,6 +66,7 @@ export function TopBar() {
             type="button"
             variant="ghost"
             id="topbar-user-menu"
+            onClick={handleSignOut}
             className="flex items-center gap-2 rounded-xl px-3 py-1.5 h-auto shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)] hover:bg-gray-50/50"
           >
             <img
@@ -62,7 +75,7 @@ export function TopBar() {
               className="h-8 w-8 rounded-full object-cover"
             />
             <span className="font-heading text-base font-semibold leading-[19px] text-[#303030]">
-              John Doe
+              {userName}
             </span>
             <ChevronDown className="h-6 w-6 text-[#303030]" />
           </Button>

@@ -16,13 +16,14 @@ assignmentRouter.post("/", uploadMiddleware, async (req, res) => {
         fileUrl = await uploadFile(req.file.buffer, key, req.file.mimetype);
     }
 
-    const { title, subject, dueDate, questionTypes, numberOfQuestions, totalMarks, additionalInstructions } = req.body;
+    const { title, subject, assignedDate, dueDate, questionTypes, numberOfQuestions, totalMarks, additionalInstructions } = req.body;
 
     const assignment = new AssignmentModel({
         userId: res.locals.session.session.userId,
         title,
         subject,
         dueDate,
+        assignedDate,
         questionTypes,
         numberOfQuestions,
         totalMarks,
@@ -37,6 +38,7 @@ assignmentRouter.post("/", uploadMiddleware, async (req, res) => {
         title: assignment.title!,
         subject: assignment.subject!,
         dueDate: assignment.dueDate!,
+        assignedDate: assignment.assignedDate!,
         questionTypes: assignment.questionTypes!,
         numberOfQuestions: assignment.numberOfQuestions!,
         totalMarks: assignment.totalMarks!,
@@ -112,6 +114,7 @@ assignmentRouter.post("/:id/regenerate", async (req, res) => {
         title: assignment.title!,
         subject: assignment.subject!,
         dueDate: assignment.dueDate!,
+        assignedDate: assignment.assignedDate!,
         questionTypes: assignment.questionTypes!,
         numberOfQuestions: assignment.numberOfQuestions!,
         totalMarks: assignment.totalMarks!,

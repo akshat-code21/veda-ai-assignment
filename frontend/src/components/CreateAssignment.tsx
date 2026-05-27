@@ -1,16 +1,18 @@
 import { useState } from "react"
+import { z } from "zod"
 import {
   Plus,
   ArrowLeft,
   ArrowRight,
   Mic,
+  AlertCircle,
 } from "lucide-react"
 import { Button } from "./ui/button"
 import { FileUpload } from "./ui/FileUpload"
 import { DatePicker } from "./ui/DatePicker"
 import { QuestionTypeRow } from "./QuestionTypeRow"
 import type { QuestionType } from "./QuestionTypeRow"
-import type { Assignment } from "./FilledState"
+import type { Assignment } from "@/types/assignment"
 
 const QUESTION_TYPE_OPTIONS = [
   "Multiple Choice Questions",
@@ -30,20 +32,50 @@ const DEFAULT_QUESTION_TYPES: QuestionType[] = [
   { id: "4", label: "Numerical Problems", numQuestions: 5, marks: 5 },
 ]
 
+// Zod schema for assignment creation validation
+const assignmentFormSchema = z.object({
+  title: z.string().min(1, "Title is required").max(200, "Title is too long"),
+  subject: z.string().min(1, "Subject is required").max(100, "Subject is too long"),
+  dueDate: z.string().min(1, "Due date is required"),
+  questionTypes: z.array(z.object({
+    id: z.string(),
+    label: z.string(),
+    numQuestions: z.number().int().min(1, "Must have at least 1 question"),
+    marks: z.number().int().min(1, "Marks must be at least 1"),
+  })).min(1, "At least one question type is required"),
+  additionalInstructions: z.string().optional(),
+})
+
+type FormErrors = Partial<Record<keyof z.infer<typeof assignmentFormSchema>, string>> & { general?: string }
+
 interface CreateAssignmentProps {
   onBack: () => void
-  onCreateAssignment: (assignment: Assignment) => void
+  onCreateAssignment: (assignment: Assignment, file?: File | null) => void
   onNext?: () => void
+  submitting?: boolean
 }
 
-export function CreateAssignment({ onBack, onCreateAssignment, onNext }: CreateAssignmentProps) {
+export function CreateAssignment({ onBack, onCreateAssignment, onNext, submitting }: CreateAssignmentProps) {
+  const [title, setTitle] = useState("")
+  const [subject, setSubject] = useState("")
   const [questionTypes, setQuestionTypes] = useState<QuestionType[]>(DEFAULT_QUESTION_TYPES)
   const [dueDate, setDueDate] = useState("")
   const [additionalInfo, setAdditionalInfo] = useState("")
   const [file, setFile] = useState<File | null>(null)
+  const [errors, setErrors] = useState<FormErrors>({})
 
   const totalQuestions = questionTypes.reduce((sum, qt) => sum + qt.numQuestions, 0)
   const totalMarks = questionTypes.reduce((sum, qt) => sum + qt.numQuestions * qt.marks, 0)
+
+  const clearFieldError = (field: keyof FormErrors) => {
+    if (errors[field]) {
+      setErrors((prev) => {
+        const next = { ...prev }
+        delete next[field]
+        return next
+      })
+    }
+  }
 
   const updateQuestionTypeValue = (id: string, field: "numQuestions" | "marks", newValue: number) => {
     setQuestionTypes((prev) =>
@@ -52,6 +84,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext }: CreateA
         return { ...qt, [field]: newValue }
       })
     )
+    clearFieldError("questionTypes")
   }
 
   const removeQuestionType = (id: string) => {
@@ -59,7 +92,6 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext }: CreateA
   }
 
   const addQuestionType = () => {
-    // Find first unused option
     const usedLabels = new Set(questionTypes.map((qt) => qt.label))
     const nextLabel = QUESTION_TYPE_OPTIONS.find((opt) => !usedLabels.has(opt))
     if (!nextLabel) return
@@ -68,6 +100,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext }: CreateA
       ...prev,
       { id: String(Date.now()), label: nextLabel, numQuestions: 1, marks: 1 },
     ])
+    clearFieldError("questionTypes")
   }
 
   const handleLabelChange = (id: string, newLabel: string) => {
@@ -77,29 +110,55 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext }: CreateA
   }
 
   const handleSubmit = () => {
-    const todayObj = new Date()
-    const d = String(todayObj.getDate()).padStart(2, "0")
-    const m = String(todayObj.getMonth() + 1).padStart(2, "0")
-    const y = todayObj.getFullYear()
-    const assignedDate = `${d}-${m}-${y}`
-
-    let title = "Custom Assignment"
-    if (file) {
-      const baseName = file.name.replace(/\.[^/.]+$/, "")
-      title = `${baseName} Assignment`
-    } else if (questionTypes.length > 0) {
-      title = `${questionTypes[0].label} Assignment`
-    }
-
-    const newAssignment: Assignment = {
-      id: String(Date.now()),
+    const result = assignmentFormSchema.safeParse({
       title,
-      assignedDate,
-      dueDate: dueDate || assignedDate,
+      subject,
+      dueDate,
+      questionTypes,
+      additionalInstructions: additionalInfo || undefined,
+    })
+
+    if (!result.success) {
+      const fieldErrors: FormErrors = {}
+      for (const issue of result.error.issues) {
+        const path = issue.path[0] as keyof FormErrors
+        if (!fieldErrors[path]) {
+          fieldErrors[path] = issue.message
+        }
+      }
+      setErrors(fieldErrors)
+      return
     }
 
-    onCreateAssignment(newAssignment)
+    setErrors({})
+
+    const typeMap: Record<string, string> = {
+      "Multiple Choice Questions": "mcq",
+      "Short Questions": "short",
+      "Long Answer Questions": "long",
+      "True/False Questions": "true_false",
+    }
+    const firstQt = questionTypes[0]
+    const mappedType = typeMap[firstQt?.label] || "mcq"
+
+    const newAssignment = {
+      _id: "",
+      userId: "",
+      title: result.data.title,
+      subject: result.data.subject,
+      assignedDate: new Date().toISOString(),
+      dueDate: result.data.dueDate,
+      questionTypes: mappedType as Assignment["questionTypes"],
+      numberOfQuestions: totalQuestions,
+      totalMarks,
+      additionalInstructions: result.data.additionalInstructions,
+      status: "pending" as const,
+    }
+
+    onCreateAssignment(newAssignment, file)
   }
+
+  const hasErrors = Object.keys(errors).length > 0
 
   return (
     <section className="flex flex-1 flex-col px-4 pb-8 lg:px-8 lg:pb-10">
@@ -137,6 +196,20 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext }: CreateA
           <div className="flex-1 h-[4px] rounded-full bg-[#D9D9D9]" />
         </div>
 
+        {hasErrors && (
+          <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 flex items-start gap-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
+            <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+            <div className="flex flex-col gap-1">
+              <p className="font-heading text-sm font-semibold text-red-600">Please fix the following errors:</p>
+              <ul className="list-disc list-inside text-sm font-sans text-red-500 space-y-0.5">
+                {Object.values(errors).map((err, i) => (
+                  <li key={i}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white/50 backdrop-blur-3xl border border-white/60 rounded-2xl p-5 lg:p-8 shadow-[0px_8px_32px_rgba(0,0,0,0.04)]">
           <h2 className="font-heading text-xl lg:text-[22px] font-bold text-[#303030] leading-tight">
             Assignment Details
@@ -145,19 +218,50 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext }: CreateA
             Basic information about your assignment
           </p>
 
+          <div className="mt-5">
+            <label className="font-heading text-base font-bold text-[#303030] block mb-2">
+              Assignment Title <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => { setTitle(e.target.value); clearFieldError("title") }}
+              placeholder="e.g. Chapter 5 - Forces & Motion Quiz"
+              className={`w-full h-11 px-4 rounded-xl border ${errors.title ? "border-red-400 ring-1 ring-red-200" : "border-[#D9D9D9]"} focus:outline-none focus:ring-1 focus:ring-black text-base font-sans text-[#303030] placeholder-[#A9A9A9] transition-all`}
+            />
+            {errors.title && <p className="text-xs text-red-500 font-sans mt-1">{errors.title}</p>}
+          </div>
+
+          <div className="mt-4">
+            <label className="font-heading text-base font-bold text-[#303030] block mb-2">
+              Subject <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => { setSubject(e.target.value); clearFieldError("subject") }}
+              placeholder="e.g. Physics, Mathematics, Biology"
+              className={`w-full h-11 px-4 rounded-xl border ${errors.subject ? "border-red-400 ring-1 ring-red-200" : "border-[#D9D9D9]"} focus:outline-none focus:ring-1 focus:ring-black text-base font-sans text-[#303030] placeholder-[#A9A9A9] transition-all`}
+            />
+            {errors.subject && <p className="text-xs text-red-500 font-sans mt-1">{errors.subject}</p>}
+          </div>
+
           <FileUpload file={file} onChange={setFile} />
 
           <div className="mt-6">
             <label className="font-heading text-base font-bold text-[#303030] block mb-2">
-              Due Date
+              Due Date <span className="text-red-400">*</span>
             </label>
-            <DatePicker value={dueDate} onChange={setDueDate} />
+            <div className={errors.dueDate ? "ring-1 ring-red-200 rounded-xl" : ""}>
+              <DatePicker value={dueDate} onChange={(val) => { setDueDate(val); clearFieldError("dueDate") }} />
+            </div>
+            {errors.dueDate && <p className="text-xs text-red-500 font-sans mt-1">{errors.dueDate}</p>}
           </div>
 
           <div className="mt-6">
             <div className="hidden lg:flex items-center gap-4 mb-3">
               <span className="font-heading text-base font-bold text-[#303030] flex-1">
-                Question Type
+                Question Type <span className="text-red-400">*</span>
               </span>
               <span className="font-heading text-sm text-[#303030] w-[120px] text-center">
                 No. of Questions
@@ -168,8 +272,12 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext }: CreateA
             </div>
 
             <span className="lg:hidden font-heading text-base font-bold text-[#303030] block mb-3">
-              Question Type
+              Question Type <span className="text-red-400">*</span>
             </span>
+
+            {errors.questionTypes && (
+              <p className="text-xs text-red-500 font-sans mb-2">{errors.questionTypes}</p>
+            )}
 
             <div className="flex flex-col gap-4">
               {questionTypes.map((qt) => (
@@ -244,10 +352,20 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext }: CreateA
           <Button
             type="button"
             onClick={onNext ?? handleSubmit}
-            className="flex items-center gap-2 h-[46px] px-8 rounded-full bg-[#181818] text-white hover:bg-neutral-800 font-heading font-medium active:scale-98 transition-all"
+            disabled={submitting}
+            className="flex items-center gap-2 h-[46px] px-8 rounded-full bg-[#181818] text-white hover:bg-neutral-800 font-heading font-medium active:scale-98 transition-all disabled:opacity-60"
           >
-            Next
-            <ArrowRight className="h-4 w-4" />
+            {submitting ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                Creating...
+              </>
+            ) : (
+              <>
+                Next
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
           </Button>
         </div>
       </div>

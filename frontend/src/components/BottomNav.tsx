@@ -5,6 +5,7 @@ import {
   Sparkles,
   Plus,
 } from "lucide-react"
+import { Link } from "react-router"
 import { Button } from "./ui/button"
 
 interface TabItem {
@@ -59,9 +60,9 @@ export function BottomNav({ onAddAssignment }: BottomNavProps) {
         aria-label="Bottom navigation"
       >
         {tabs.map((tab) => (
-          <a
+          <Link
             key={tab.label}
-            href="#"
+            to="/assignments"
             className={`flex flex-col items-center gap-1 rounded-[26px] px-2 py-1.5 transition-colors ${tab.active
               ? "bg-white/10"
               : "bg-transparent"
@@ -80,7 +81,7 @@ export function BottomNav({ onAddAssignment }: BottomNavProps) {
             >
               {tab.label}
             </span>
-          </a>
+          </Link>
         ))}
       </nav>
     </div>
