@@ -67,16 +67,17 @@ export function FilledState({
 
       {/* Mobile Header (Back button + Title) */}
       <div className="flex lg:hidden items-center justify-between mt-3 mb-6 relative">
-        <button
+        <Button
           type="button"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-[0px_4px_12px_rgba(0,0,0,0.05)] transition-all hover:bg-gray-50 active:scale-95"
+          variant="ghost"
           onClick={() => {
             // Mock going back
           }}
           aria-label="Go back"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-[0px_4px_12px_rgba(0,0,0,0.05)] hover:bg-gray-50 active:scale-95 p-0"
         >
           <ArrowLeft className="h-5 w-5 text-[#303030]" />
-        </button>
+        </Button>
         <h1 className="absolute left-1/2 -translate-x-1/2 font-heading text-lg font-semibold text-[#303030] leading-none">
           Assignments
         </h1>
@@ -87,9 +88,10 @@ export function FilledState({
       {/* Filter & Search Bar Card */}
       <div className="bg-white rounded-2xl p-3 lg:p-4 shadow-[0px_4px_24px_rgba(0,0,0,0.02)] flex flex-row items-center justify-between gap-4 mb-6">
         {/* Filter segment */}
-        <button
+        <Button
           type="button"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group"
+          variant="ghost"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-gray-50 h-auto group"
         >
           <Funnel className="h-[18px] w-[18px] text-[#5E5E5E] group-hover:text-[#303030]" />
           <span className="font-heading text-sm lg:text-base font-semibold text-[#5E5E5E] group-hover:text-[#303030]">
@@ -97,7 +99,7 @@ export function FilledState({
             <span className="inline lg:hidden">Filter</span>
           </span>
           <ChevronDown className="h-4 w-4 text-[#5E5E5E] group-hover:text-[#303030]" />
-        </button>
+        </Button>
 
         {/* Search Input segment */}
         <div className="relative flex-1 max-w-[280px] lg:max-w-[340px]">
@@ -124,16 +126,17 @@ export function FilledState({
               <h3 className="font-heading text-lg lg:text-[20px] font-bold text-[#303030] leading-tight select-none">
                 {assignment.title}
               </h3>
-              <button
+              <Button
                 type="button"
-                className="cursor-pointer h-8 w-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors shrink-0"
+                variant="ghost"
+                className="h-8 w-8 p-0 rounded-full hover:bg-gray-100 shrink-0"
                 onClick={(e) => {
                   e.stopPropagation()
                   setActiveMenuId(activeMenuId === assignment.id ? null : assignment.id)
                 }}
               >
                 <MoreVertical className="h-5 w-5 text-[#5E5E5E]" />
-              </button>
+              </Button>
             </div>
 
             {/* Bottom Row - Meta Info */}
@@ -154,26 +157,28 @@ export function FilledState({
                 ref={menuRef}
                 className="absolute right-4 top-14 w-[160px] bg-white rounded-xl shadow-[0px_8px_32px_rgba(0,0,0,0.15)] border border-gray-100 py-1.5 z-40 animate-in fade-in slide-in-from-top-2 duration-150"
               >
-                <button
+                <Button
                   type="button"
-                  className="w-full px-4 py-2 text-left text-sm font-sans text-[#303030] hover:bg-[#F0F0F0] transition-colors flex items-center gap-2 cursor-pointer"
+                  variant="ghost"
+                  className="w-full px-4 py-2 h-auto rounded-none text-left text-sm font-sans text-[#303030] hover:bg-[#F0F0F0] justify-start"
                   onClick={() => {
                     setActiveMenuId(null)
                     alert(`Viewing details for: ${assignment.title}`)
                   }}
                 >
                   View Assignment
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className="w-full px-4 py-2 text-left text-sm font-sans text-red-500 hover:bg-[#FFF1F0] transition-colors flex items-center gap-2 cursor-pointer font-medium"
+                  variant="ghost"
+                  className="w-full px-4 py-2 h-auto rounded-none text-left text-sm font-sans text-red-500 hover:bg-[#FFF1F0] hover:text-red-500 justify-start font-medium"
                   onClick={() => {
                     setActiveMenuId(null)
                     onDeleteAssignment(assignment.id)
                   }}
                 >
                   Delete
-                </button>
+                </Button>
               </div>
             )}
           </div>
@@ -184,12 +189,13 @@ export function FilledState({
             <p className="font-heading text-lg font-medium text-[#5E5E5E]">
               No assignments match "{searchQuery}"
             </p>
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setSearchQuery("")}
-              className="mt-2 text-sm text-[#FF7950] font-semibold hover:underline"
+              className="mt-2 text-sm text-[#FF7950] font-semibold hover:underline hover:text-[#FF7950] hover:bg-transparent h-auto p-0"
             >
               Clear search query
-            </button>
+            </Button>
           </div>
         )}
       </div>
