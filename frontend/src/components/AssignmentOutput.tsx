@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { PDFViewer, ZoomMode } from "@embedpdf/react-pdf-viewer"
-import { Download, RefreshCw } from "lucide-react"
+import { Download, FilePlusCorner, RefreshCw } from "lucide-react"
 
 interface AssignmentOutputProps {
   onBack: () => void
@@ -63,7 +63,7 @@ export function AssignmentOutput({ onBack: _onBack, pdfUrl, title, subject, onRe
   }
 
   return (
-    <section className="flex flex-col px-4 lg:px-8 pb-10">
+    <section className="flex flex-col px-4 lg:pl-1 lg:pr-2 pb-10 ">
       <div className="hidden lg:flex flex-col pt-1">
         <div
           className="rounded-[32px] p-5 flex flex-col gap-3"
@@ -83,7 +83,7 @@ export function AssignmentOutput({ onBack: _onBack, pdfUrl, title, subject, onRe
                 onClick={handleDownload}
                 className="flex items-center gap-1 self-start h-[44px] px-6 rounded-full bg-white hover:bg-gray-50 transition-colors cursor-pointer"
               >
-                <Download className="h-5 w-5 text-[#303030]" />
+                <FilePlusCorner className="h-5 w-5 text-[#303030]" />
                 <span className="font-heading text-base font-medium text-[#303030] leading-[22px]">
                   Download as PDF
                 </span>

@@ -156,7 +156,7 @@ export function DatePicker({ value, onChange, placeholder = "DD-MM-YYYY" }: Date
             selected
               ? "bg-[#303030] text-white font-semibold"
               : currentToday
-                ? "border border-[#FF7950] text-[#FF7950] font-semibold hover:bg-[#FF7950]/5"
+                ? "border border-[#FF5623] text-[#FF5623] font-semibold hover:bg-[#FF5623]/5"
                 : "text-[#303030] hover:bg-gray-100"
           )}
         >

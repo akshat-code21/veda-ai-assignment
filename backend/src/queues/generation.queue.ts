@@ -21,6 +21,7 @@ export interface JobPayload {
     questionTypes: QuestionTypeConfig[] | string;
     numberOfQuestions: number;
     totalMarks: number;
+    timeAllowed?: string;
     additionalInstructions?: string;
     fileUrl?: string;
     status: "pending" | "processing" | "completed" | "failed";

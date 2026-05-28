@@ -9,6 +9,7 @@ const AssignmentSchema = new mongoose.Schema({
     questionTypes: { type: mongoose.Schema.Types.Mixed, default: "mcq" },
     numberOfQuestions: { type: Number },
     totalMarks: { type: Number },
+    timeAllowed: { type: String },
     additionalInstructions: { type: String },
     fileUrl: { type: String },
     status: { type: String, enum: ["pending", "processing", "completed", "failed"], default: "pending" },

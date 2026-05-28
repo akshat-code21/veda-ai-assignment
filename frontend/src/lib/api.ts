@@ -21,4 +21,5 @@ export const assignmentApi = {
     get: (id: string) => api.get<Assignment>(`/api/assignments/${id}`).then((res) => res.data),
     create: (data: FormData) => api.post<Assignment>("/api/assignments", data).then((res) => res.data),
     regenerate: (id: string) => api.post(`/api/assignments/${id}/regenerate`).then((res) => res.data),
+    delete: (id: string) => api.delete<{ message: string }>(`/api/assignments/${id}`).then((res) => res.data),
 }

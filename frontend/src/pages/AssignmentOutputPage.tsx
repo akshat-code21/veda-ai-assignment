@@ -81,14 +81,14 @@ export function AssignmentOutputPage() {
   if (assignment.status === "pending" || assignment.status === "processing") {
     return (
       <section className="flex flex-1 flex-col items-center justify-center gap-4 px-4">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-primary" />
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-[#FF5623]" />
         <h2 className="font-heading text-xl font-bold text-[#303030]">
           {assignment.status === "pending" ? "Queued for generation..." : "Generating your paper..."}
         </h2>
         <p className="font-sans text-sm text-[#5E5E5E] text-center max-w-md">
           {assignment.status === "pending"
             ? "Your assignment is in the queue. Generation will start shortly."
-            : "AI is crafting your question paper. This usually takes 30–60 seconds."}
+            : "AI is crafting your question paper. This usually takes 30-60 seconds."}
         </p>
       </section>
     )

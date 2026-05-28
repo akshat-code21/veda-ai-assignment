@@ -16,7 +16,7 @@ assignmentRouter.post("/", uploadMiddleware, async (req, res) => {
         fileUrl = await uploadFile(req.file.buffer, key, req.file.mimetype);
     }
 
-    const { title, subject, assignedDate, dueDate, questionTypes, numberOfQuestions, totalMarks, additionalInstructions } = req.body;
+    const { title, subject, assignedDate, dueDate, questionTypes, numberOfQuestions, totalMarks, timeAllowed, additionalInstructions } = req.body;
 
     const parseDateString = (dateStr: any): Date | undefined => {
         if (!dateStr) return undefined;
@@ -47,6 +47,7 @@ assignmentRouter.post("/", uploadMiddleware, async (req, res) => {
         questionTypes: parsedQuestionTypes,
         numberOfQuestions,
         totalMarks,
+        timeAllowed,
         additionalInstructions,
         fileUrl
     });
@@ -62,6 +63,7 @@ assignmentRouter.post("/", uploadMiddleware, async (req, res) => {
         questionTypes: assignment.questionTypes!,
         numberOfQuestions: assignment.numberOfQuestions!,
         totalMarks: assignment.totalMarks!,
+        timeAllowed: (assignment as any).timeAllowed,
         additionalInstructions: assignment.additionalInstructions!,
         fileUrl: assignment.fileUrl!,
         status: "pending",
@@ -78,7 +80,7 @@ assignmentRouter.post("/", uploadMiddleware, async (req, res) => {
 
 assignmentRouter.get("/", async (req, res) => {
     const { userId } = res.locals.session.session
-    const assignments = await AssignmentModel.find({ userId }).lean();
+    const assignments = await AssignmentModel.find({ userId }).sort({ dueDate: -1 }).lean();
 
     const signedAssignments = await Promise.all(
         assignments.map(async (assignment) => {
@@ -140,12 +142,25 @@ assignmentRouter.post("/:id/regenerate", async (req, res) => {
         questionTypes: assignment.questionTypes!,
         numberOfQuestions: assignment.numberOfQuestions!,
         totalMarks: assignment.totalMarks!,
+        timeAllowed: (assignment as any).timeAllowed,
         additionalInstructions: assignment.additionalInstructions!,
         fileUrl: assignment.fileUrl!,
         jobId: id,
         status: "pending"
     });
     return res.status(200).json({ message: "Regeneration started" });
+})
+
+assignmentRouter.delete("/:id", async (req, res) => {
+    const { id } = req.params;
+    const { userId } = res.locals.session.session;
+
+    const result = await AssignmentModel.deleteOne({ _id: id, userId });
+    if (result.deletedCount === 0) {
+        return res.status(404).json({ message: "Assignment not found or unauthorized" });
+    }
+
+    return res.status(200).json({ message: "Assignment deleted successfully" });
 })
 
 export default assignmentRouter

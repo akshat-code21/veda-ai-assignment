@@ -72,7 +72,7 @@ export function Sidebar({ assignmentsCount = 0, onAddAssignment }: SidebarProps)
             className="relative flex w-[251px] h-[42px] items-center justify-center gap-[10px] px-[43px] py-[7px] text-white cursor-pointer transition-all hover:opacity-90 active:scale-[0.98] outline-none border-none bg-transparent hover:bg-transparent"
             style={{
               background:
-                "linear-gradient(#272727, #272727) padding-box, linear-gradient(90deg, #FF7950 0%, #C0350A 100%) border-box",
+                "linear-gradient(#272727, #272727) padding-box, linear-gradient(90deg, #FF5623 0%, #C0350A 100%) border-box",
               border: "4px solid transparent",
               borderRadius: "100px",
               boxShadow:
@@ -110,7 +110,7 @@ export function Sidebar({ assignmentsCount = 0, onAddAssignment }: SidebarProps)
               </span>
               <span className="leading-[22px]">{item.label}</span>
               {item.label === "Assignments" && assignmentsCount > 0 && (
-                <span className="ml-auto bg-[#FF7950] text-white text-[12px] font-bold px-[8px] py-[2.5px] rounded-full shrink-0 select-none">
+                <span className="ml-auto bg-[#FF5623] text-white text-[12px] font-bold px-[8px] py-[2.5px] rounded-full shrink-0 select-none">
                   {assignmentsCount}
                 </span>
               )}

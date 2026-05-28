@@ -43,6 +43,7 @@ const assignmentFormSchema = z.object({
     numQuestions: z.number().int().min(1, "Must have at least 1 question"),
     marks: z.number().int().min(1, "Marks must be at least 1"),
   })).min(1, "At least one question type is required"),
+  timeAllowed: z.string().optional(),
   additionalInstructions: z.string().optional(),
 })
 
@@ -60,6 +61,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
   const [subject, setSubject] = useState("")
   const [questionTypes, setQuestionTypes] = useState<QuestionType[]>(DEFAULT_QUESTION_TYPES)
   const [dueDate, setDueDate] = useState("")
+  const [timeAllowed, setTimeAllowed] = useState("")
   const [additionalInfo, setAdditionalInfo] = useState("")
   const [file, setFile] = useState<File | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -115,6 +117,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
       subject,
       dueDate,
       questionTypes,
+      timeAllowed: timeAllowed || undefined,
       additionalInstructions: additionalInfo || undefined,
     })
 
@@ -146,6 +149,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
       })),
       numberOfQuestions: totalQuestions,
       totalMarks,
+      timeAllowed: result.data.timeAllowed,
       additionalInstructions: result.data.additionalInstructions,
       status: "pending" as const,
     }
@@ -163,7 +167,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
           <h1 className="font-heading text-[28px] font-bold leading-none text-[#303030]">
             Create Assignment
           </h1>
-          <p className="font-sans text-base text-[#5E5E5E] mt-1.5 leading-none">
+          <p className="font-sans text-base text-[#5E5E5E]/55 mt-1.5 leading-none">
             Set up a new assignment for your students
           </p>
         </div>
@@ -175,9 +179,9 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
           variant="ghost"
           onClick={onBack}
           aria-label="Go back"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-[0px_4px_12px_rgba(0,0,0,0.05)] hover:bg-gray-50 active:scale-95 p-0"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFFFFF]/25 shadow-[0px_4px_12px_rgba(0,0,0,0.05)] hover:bg-gray-50 active:scale-95 p-0"
         >
-          <ArrowLeft className="h-5 w-5 text-[#303030]" />
+          <ArrowLeft className="size-6 text-[#303030]" />
         </Button>
         <h1 className="absolute left-1/2 -translate-x-1/2 font-heading text-lg font-semibold text-[#303030] leading-none">
           Create Assignment
@@ -209,13 +213,13 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
           <h2 className="font-heading text-xl lg:text-[22px] font-bold text-[#303030] leading-tight">
             Assignment Details
           </h2>
-          <p className="font-sans text-sm text-[#5E5E5E] mt-1 leading-none">
+          <p className="font-light! font-sans text-sm text-[#5E5E5E]/80 mt-1 leading-none">
             Basic information about your assignment
           </p>
 
           <div className="mt-5">
             <label className="font-heading text-base font-bold text-[#303030] block mb-2">
-              Assignment Title <span className="text-red-400">*</span>
+              Assignment Title
             </label>
             <input
               type="text"
@@ -229,7 +233,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
 
           <div className="mt-4">
             <label className="font-heading text-base font-bold text-[#303030] block mb-2">
-              Subject <span className="text-red-400">*</span>
+              Subject
             </label>
             <input
               type="text"
@@ -241,11 +245,25 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
             {errors.subject && <p className="text-xs text-red-500 font-sans mt-1">{errors.subject}</p>}
           </div>
 
+          <div className="mt-4">
+            <label className="font-heading text-base font-bold text-[#303030] block mb-2">
+              Time Allowed
+            </label>
+            <input
+              type="text"
+              value={timeAllowed}
+              onChange={(e) => { setTimeAllowed(e.target.value); clearFieldError("timeAllowed") }}
+              placeholder="e.g. 60, 90, 120 (or '1 Hour', '1.5 Hours')"
+              className={`w-full h-11 px-4 rounded-xl border ${errors.timeAllowed ? "border-red-400 ring-1 ring-red-200" : "border-[#D9D9D9]"} focus:outline-none focus:ring-1 focus:ring-black text-base font-sans text-[#303030] placeholder-[#A9A9A9] transition-all`}
+            />
+            {errors.timeAllowed && <p className="text-xs text-red-500 font-sans mt-1">{errors.timeAllowed}</p>}
+          </div>
+
           <FileUpload file={file} onChange={setFile} />
 
           <div className="mt-6">
             <label className="font-heading text-base font-bold text-[#303030] block mb-2">
-              Due Date <span className="text-red-400">*</span>
+              Due Date
             </label>
             <div className={errors.dueDate ? "ring-1 ring-red-200 rounded-xl" : ""}>
               <DatePicker value={dueDate} onChange={(val) => { setDueDate(val); clearFieldError("dueDate") }} />
@@ -256,7 +274,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
           <div className="mt-6">
             <div className="hidden lg:flex items-center gap-4 mb-3">
               <span className="font-heading text-base font-bold text-[#303030] flex-1">
-                Question Type <span className="text-red-400">*</span>
+                Question Type
               </span>
               <span className="font-heading text-sm text-[#303030] w-[120px] text-center">
                 No. of Questions
@@ -267,7 +285,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
             </div>
 
             <span className="lg:hidden font-heading text-base font-bold text-[#303030] block mb-3">
-              Question Type <span className="text-red-400">*</span>
+              Question Type
             </span>
 
             {errors.questionTypes && (
@@ -321,7 +339,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
                 value={additionalInfo}
                 onChange={(e) => setAdditionalInfo(e.target.value)}
                 rows={3}
-                className="w-full p-4 pr-12 rounded-2xl border border-[#D9D9D9] focus:outline-none focus:ring-1 focus:ring-black text-base font-sans text-[#303030] placeholder-[#A9A9A9] resize-none"
+                className="w-full p-4 pr-12 rounded-2xl border border-[#D9D9D9] focus:outline-none focus:ring-1 focus:ring-black text-base font-sans text-[#303030]/60 placeholder-[#A9A9A9] resize-none"
               />
               <Button
                 type="button"
@@ -334,7 +352,7 @@ export function CreateAssignment({ onBack, onCreateAssignment, onNext, submittin
           </div>
         </div>
 
-        <div className="flex items-center justify-center mt-6 pb-24 lg:pb-0 gap-4">
+        <div className="flex items-center justify-center lg:justify-between mt-6 pb-24 lg:pb-0 gap-4">
           <Button
             type="button"
             variant="outline"

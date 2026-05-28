@@ -101,7 +101,7 @@ export function FileUpload({ file, onChange }: FileUploadProps) {
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
         className={`mt-6 border-2 border-dashed rounded-2xl p-6 lg:p-10 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer select-none ${isDragActive
-          ? "border-[#FF7950] bg-[#FF7950]/5"
+          ? "border-[#FF5623] bg-[#FF5623]/5"
           : file
             ? "border-[#22C55E]/50 bg-white"
             : "border-[#D9D9D9] hover:border-[#A9A9A9] bg-white"
@@ -132,7 +132,7 @@ export function FileUpload({ file, onChange }: FileUploadProps) {
           </div>
         ) : (
           <>
-            <CloudUpload className={`h-8 w-8 transition-colors ${isDragActive ? "text-[#FF7950]" : "text-[#2b2b2b]"}`} />
+            <CloudUpload className={`h-8 w-8 transition-colors ${isDragActive ? "text-[#FF5623]" : "text-[#2b2b2b]"}`} />
             <p className="font-heading text-base font-medium text-[#303030] text-center">
               Choose a file or drag & drop it here
             </p>
@@ -157,7 +157,7 @@ export function FileUpload({ file, onChange }: FileUploadProps) {
         </p>
       )}
 
-      <p className="text-sm text-[#5E5E5E] mt-3 text-center font-sans">
+      <p className="text-sm text-[#303030]/60 mt-3 text-center font-sans">
         Upload documents (PDF, TXT, DOC, DOCX) of your preferred material
       </p>
     </div>

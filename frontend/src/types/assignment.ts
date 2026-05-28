@@ -14,6 +14,7 @@ export interface Assignment {
     questionTypes: QuestionTypeConfig[] | string;
     numberOfQuestions: number;
     totalMarks: number;
+    timeAllowed?: string;
     additionalInstructions?: string;
     fileUrl?: string;           // presigned S3 URL
     pdfUrl?: string;            // presigned S3 URL for generated PDF

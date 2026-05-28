@@ -48,7 +48,7 @@ export function FilledState({
   }, [])
 
   return (
-    <section className="flex flex-1 flex-col px-4 lg:px-8 pb-10 relative">
+    <section className="flex flex-1 flex-col px-4 lg:pl-1 lg:pr-8 pb-10 relative">
       {/* Desktop Header */}
       <div className="hidden lg:flex items-center gap-3 mt-4 mb-6">
         {/* Green indicator dot */}
@@ -57,7 +57,7 @@ export function FilledState({
           <h1 className="font-heading text-[28px] font-bold leading-none text-[#303030]">
             Assignments
           </h1>
-          <p className="font-sans text-base text-[#5E5E5E] mt-1.5 leading-none">
+          <p className="font-sans text-base text-[#5E5E5E]/55 mt-1.5 leading-none">
             Manage and create assignments for your classes.
           </p>
         </div>
@@ -72,9 +72,9 @@ export function FilledState({
             // Mock going back
           }}
           aria-label="Go back"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-[0px_4px_12px_rgba(0,0,0,0.05)] hover:bg-gray-50 active:scale-95 p-0"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFFFFF]/25 shadow-[0px_4px_12px_rgba(0,0,0,0.05)] hover:bg-gray-50 active:scale-95 p-0"
         >
-          <ArrowLeft className="h-5 w-5 text-[#303030]" />
+          <ArrowLeft className="size-6 text-[#303030]" />
         </Button>
         <h1 className="absolute left-1/2 -translate-x-1/2 font-heading text-lg font-semibold text-[#303030] leading-none">
           Assignments
@@ -91,8 +91,8 @@ export function FilledState({
           variant="ghost"
           className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-gray-50 h-auto group"
         >
-          <Funnel className="h-[18px] w-[18px] text-[#5E5E5E] group-hover:text-[#303030]" />
-          <span className="font-heading text-sm lg:text-base font-semibold text-[#5E5E5E] group-hover:text-[#303030]">
+          <Funnel className="h-[18px] w-[18px] text-[#A9A9A9] group-hover:text-[#303030]" />
+          <span className="font-heading text-sm lg:text-base font-semibold text-[#A9A9A9] group-hover:text-[#303030]">
             <span className="hidden lg:inline">Filter By</span>
             <span className="inline lg:hidden">Filter</span>
           </span>
@@ -100,14 +100,14 @@ export function FilledState({
         </Button>
 
         {/* Search Input segment */}
-        <div className="relative flex-1 max-w-[280px] lg:max-w-[340px]">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-[#A9A9A9]" />
+        <div className="relative flex-1 max-w-[280px] lg:max-w-[340px] ">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-[#A9A9A9] font-bold" />
           <input
             type="text"
             placeholder={window.innerWidth >= 1024 ? "Search Assignment" : "Search Name"}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-10 pl-10 pr-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-1 focus:ring-black text-sm lg:text-base font-sans text-[#303030] placeholder-[#A9A9A9]"
+            className="border-[#000000]/20 w-full h-10 pl-10 pr-4 rounded-full border focus:outline-none focus:ring-1 focus:ring-black text-sm lg:text-base font-bold font-sans text-[#303030] placeholder-[#A9A9A9]"
           />
         </div>
       </div>
@@ -142,7 +142,7 @@ export function FilledState({
             <div className="flex items-center justify-between gap-4 text-sm font-sans leading-none mt-auto">
               <div className="flex items-center gap-1.5">
                 <span className="font-bold text-[#303030]">Assigned on :</span>
-                <span className="text-[#5E5E5E]">
+                <span className="text-[#303030]/50">
                   {(() => {
                     if (!assignment.assignedDate) return ""
                     const d = new Date(assignment.assignedDate)
@@ -152,7 +152,7 @@ export function FilledState({
               </div>
               <div className="flex items-center gap-1.5 ml-auto lg:ml-0">
                 <span className="font-bold text-[#303030]">Due :</span>
-                <span className="text-[#5E5E5E]">
+                <span className="text-[#303030]/50">
                   {(() => {
                     if (!assignment.dueDate) return ""
                     const d = new Date(assignment.dueDate)
@@ -203,7 +203,7 @@ export function FilledState({
             <Button
               variant="ghost"
               onClick={() => setSearchQuery("")}
-              className="mt-2 text-sm text-[#FF7950] font-semibold hover:underline hover:text-[#FF7950] hover:bg-transparent h-auto p-0"
+              className="mt-2 text-sm text-[#FF5623] font-semibold hover:underline hover:text-[#FF5623] hover:bg-transparent h-auto p-0"
             >
               Clear search query
             </Button>

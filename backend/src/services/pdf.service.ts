@@ -3,7 +3,7 @@ import type { GeneratedPaper } from "./llm.service";
 import fs from "fs";
 import path from "path";
 
-const FONTS_DIR = path.join(process.cwd(), "assets", "fonts");
+const FONTS_DIR = path.join(__dirname, "..", "..", "assets", "fonts");
 
 async function ensureFontsExist() {
     if (!fs.existsSync(FONTS_DIR)) {
@@ -11,9 +11,9 @@ async function ensureFontsExist() {
     }
 
     const fontUrls = {
-        "Inter-Regular.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/Inter%5Bopsz%2Cwght%5D.ttf",
-        "Inter-Bold.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/Inter%5Bopsz%2Cwght%5D.ttf",
-        "Inter-Italic.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/Inter-Italic%5Bopsz%2Cwght%5D.ttf"
+        "Inter-Regular.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/lato/Lato-Regular.ttf",
+        "Inter-Bold.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/lato/Lato-Bold.ttf",
+        "Inter-Italic.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/lato/Lato-Italic.ttf"
     };
 
     for (const [filename, url] of Object.entries(fontUrls)) {
@@ -42,12 +42,12 @@ export async function generatePdfBuffer(
     title: string,
     subject: string,
     totalMarks: number,
-    paper: GeneratedPaper
+    paper: GeneratedPaper,
+    timeAllowedInput?: string
 ): Promise<Buffer> {
     return new Promise(async (resolve, reject) => {
         try {
-            // Ensure font files exist before creating the PDF document
-            await ensureFontsExist();
+            // await ensureFontsExist();
 
             const doc = new PDFDocument({ margin: 50, bufferPages: true });
             const buffers: Buffer[] = [];
@@ -71,8 +71,14 @@ export async function generatePdfBuffer(
             doc.fontSize(12).font("Inter-Bold").text(classText, { align: "center" });
             doc.moveDown(1);
 
-            const totalQuestions = paper.sections.reduce((acc, s) => acc + s.questions.length, 0);
-            const timeAllowed = totalQuestions <= 5 ? "30 minutes" : totalQuestions <= 10 ? "45 minutes" : "1 Hour";
+            let timeAllowed = timeAllowedInput;
+            if (timeAllowed && /^\d+$/.test(timeAllowed.trim())) {
+                timeAllowed = `${timeAllowed.trim()} minutes`;
+            }
+            if (!timeAllowed) {
+                const totalQuestions = paper.sections.reduce((acc, s) => acc + s.questions.length, 0);
+                timeAllowed = totalQuestions <= 5 ? "30 minutes" : totalQuestions <= 10 ? "45 minutes" : "1 Hour";
+            }
 
             const startY = doc.y;
             doc.fontSize(10.5).font("Inter-Bold")
@@ -88,7 +94,7 @@ export async function generatePdfBuffer(
             doc.moveDown(0.3);
             doc.text("Roll Number: ________________");
             doc.moveDown(0.3);
-            doc.text(`${classText} Section: ___________`);
+            doc.text(`${classText}Section: ___________`);
             doc.moveDown(2);
 
             for (const section of paper.sections) {

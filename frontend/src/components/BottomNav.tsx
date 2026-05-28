@@ -40,7 +40,7 @@ interface BottomNavProps {
 
 export function BottomNav({ onAddAssignment }: BottomNavProps) {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col items-end gap-3 px-2.5 pb-4 mt-4 lg:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col items-end gap-3 px-2.5 pb-5 pt-10 lg:hidden bg-gradient-to-t from-[#CECECE] via-[#CECECE]/95 to-transparent">
       {onAddAssignment && (
         <Button
           type="button"
@@ -50,7 +50,7 @@ export function BottomNav({ onAddAssignment }: BottomNavProps) {
           id="mobile-fab-create"
           className="flex h-12 w-12 items-center justify-center rounded-full bg-white p-0 shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)] hover:scale-105 hover:bg-white/90 active:scale-95"
         >
-          <Plus className="h-5 w-5 text-[#303030]" />
+          <Plus className="size-5 text-[#FF5623]" />
         </Button>
       )}
 

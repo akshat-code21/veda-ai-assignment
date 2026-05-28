@@ -74,7 +74,7 @@ export function TopBar() {
                 type="button"
                 variant="ghost"
                 id="topbar-user-menu"
-                className="flex items-center gap-2 rounded-xl px-3 py-1.5 h-auto shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)] hover:bg-gray-50/50 cursor-pointer"
+                className="flex items-center gap-2 rounded-xl px-3 py-1.5 h-auto hover:bg-gray-50/50 cursor-pointer shadow-none"
               >
                 <img
                   src="/images/user-avatar.png"
@@ -138,7 +138,7 @@ export function TopBar() {
                 id="mobile-menu-btn"
                 className="flex h-6 w-6 items-center justify-center p-0 cursor-pointer"
               >
-                <Menu className="h-6 w-6 text-[#303030]" />
+                <Menu strokeWidth={3} className="size-5 text-[#303030]" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 bg-white border border-gray-100 rounded-xl shadow-lg mt-1 p-1">

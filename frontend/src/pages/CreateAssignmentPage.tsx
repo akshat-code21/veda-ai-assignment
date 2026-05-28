@@ -27,6 +27,9 @@ export function CreateAssignmentPage() {
       if (assignment.additionalInstructions) {
         formData.append("additionalInstructions", assignment.additionalInstructions)
       }
+      if (assignment.timeAllowed) {
+        formData.append("timeAllowed", assignment.timeAllowed)
+      }
       if (file) {
         formData.append("source_file", file)
       }

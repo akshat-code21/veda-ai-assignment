@@ -5,6 +5,7 @@ import { FilledState } from "@/components/FilledState"
 import { EmptyState } from "@/components/EmptyState"
 import { useAssignmentStore } from "@/store/useAssignmentStore"
 import { assignmentApi } from "@/lib/api"
+import { toast } from "sonner"
 
 export function AssignmentsPage() {
   const navigate = useNavigate()
@@ -22,6 +23,17 @@ export function AssignmentsPage() {
       setAssignments(data)
     }
   }, [data, setAssignments])
+
+  const handleDeleteAssignment = async (id: string) => {
+    try {
+      await assignmentApi.delete(id)
+      deleteAssignment(id)
+      toast.success("Assignment deleted successfully.")
+    } catch (err) {
+      console.error("Failed to delete assignment:", err)
+      toast.error("Failed to delete assignment. Please try again.")
+    }
+  }
 
   if (isLoading) {
     return (
@@ -41,7 +53,7 @@ export function AssignmentsPage() {
   return (
     <FilledState
       assignments={assignments}
-      onDeleteAssignment={deleteAssignment}
+      onDeleteAssignment={handleDeleteAssignment}
       onAddAssignment={() => navigate("/assignments/create")}
     />
   )

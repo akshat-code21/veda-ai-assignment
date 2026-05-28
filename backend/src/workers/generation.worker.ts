@@ -30,7 +30,8 @@ const worker = new Worker("question-generation", async (job) => {
             processedInput.title,
             processedInput.subject,
             processedInput.totalMarks,
-            generatedPaper
+            generatedPaper,
+            processedInput.timeAllowed
         );
 
         console.log(`[Worker] Uploading PDF to S3 for assignment: ${assignmentId}`);
