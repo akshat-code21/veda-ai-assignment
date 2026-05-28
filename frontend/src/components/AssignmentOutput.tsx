@@ -124,14 +124,24 @@ export function AssignmentOutput({ onBack: _onBack, pdfUrl, title, subject, onRe
                 ? `${subject}: ${title}`
                 : "Your generated question paper"}
             </p>
-            <button
-              onClick={handleDownload}
-              className="flex h-9 w-9 items-center justify-center rounded-full shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
-              style={{ backgroundColor: "rgba(246, 246, 246, 0.1)" }}
-              aria-label="Download PDF"
-            >
-              <Download className="h-5 w-5 text-[#F0F0F0]" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleDownload}
+                className="flex items-center gap-1.5 h-[36px] px-4 rounded-full bg-white text-[#303030] hover:bg-gray-100 transition-colors cursor-pointer text-xs font-semibold leading-none shrink-0"
+              >
+                <Download className="h-4 w-4 text-[#303030]" />
+                Download PDF
+              </button>
+              {onRegenerate && (
+                <button
+                  onClick={onRegenerate}
+                  className="flex items-center gap-1.5 h-[36px] px-4 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors cursor-pointer text-xs font-semibold leading-none shrink-0"
+                >
+                  <RefreshCw className="h-4 w-4 text-white" />
+                  Regenerate
+                </button>
+              )}
+            </div>
           </div>
 
           <div

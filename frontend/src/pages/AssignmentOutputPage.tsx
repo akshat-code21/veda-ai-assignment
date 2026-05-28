@@ -15,21 +15,12 @@ export function AssignmentOutputPage() {
     queryKey: ["assignment", id],
     queryFn: () => assignmentApi.get(id!),
     enabled: !!id,
-    refetchInterval: (query) => {
-      const status = query.state.data?.status
-      if (status === "pending" || status === "processing") return 3000
-      return false
-    },
   })
 
   const isProcessing = assignment?.status === "pending" || assignment?.status === "processing"
 
   const handleWsStatusChange = useCallback((type: string) => {
-    if (type === "assignment:completed" || type === "assignment:failed") {
-      queryClient.invalidateQueries({ queryKey: ["assignment", id] })
-      queryClient.invalidateQueries({ queryKey: ["assignments"] })
-    }
-    if (type === "assignment:processing") {
+    if (type === "assignment:completed" || type === "assignment:failed" || type === "assignment:processing") {
       queryClient.invalidateQueries({ queryKey: ["assignment", id] })
     }
   }, [id, queryClient])
