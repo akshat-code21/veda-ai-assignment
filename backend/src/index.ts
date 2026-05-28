@@ -20,6 +20,9 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());
 app.use("/api/assignments", assignmentRouter);
+app.get("/health", (_, res) => {
+    res.status(200).send("OK");
+});
 
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.error(`[Error Handler] Error occurred:`, err.message);
