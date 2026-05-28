@@ -81,7 +81,7 @@ export function AssignmentOutputPage() {
   if (assignment.status === "pending" || assignment.status === "processing") {
     return (
       <section className="flex flex-1 flex-col items-center justify-center gap-4 px-4">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-blue-500" />
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-primary" />
         <h2 className="font-heading text-xl font-bold text-[#303030]">
           {assignment.status === "pending" ? "Queued for generation..." : "Generating your paper..."}
         </h2>

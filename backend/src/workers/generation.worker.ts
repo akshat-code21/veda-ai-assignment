@@ -34,7 +34,7 @@ const worker = new Worker("question-generation", async (job) => {
         );
 
         console.log(`[Worker] Uploading PDF to S3 for assignment: ${assignmentId}`);
-        const pdfUrl = await uploadReportToS3(pdfBuffer, `${assignmentId}.pdf`);
+        const pdfUrl = await uploadReportToS3(pdfBuffer, `${assignmentId}-${Date.now()}.pdf`);
         console.log(`[Worker] PDF uploaded to S3: ${pdfUrl}`);
 
         await AssignmentModel.updateOne({ _id: assignmentId }, {

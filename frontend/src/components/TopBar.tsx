@@ -2,6 +2,12 @@ import { Bell, ChevronDown, LayoutGrid, Menu } from "lucide-react"
 import { useNavigate } from "react-router"
 import { Button } from "./ui/button"
 import { authClient } from "@/lib/auth-client"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu"
 
 export function TopBar() {
   const navigate = useNavigate()
@@ -62,23 +68,34 @@ export function TopBar() {
             <span className="absolute right-px top-px h-2 w-2 rounded-full bg-red-500" />
           </Button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            id="topbar-user-menu"
-            onClick={handleSignOut}
-            className="flex items-center gap-2 rounded-xl px-3 py-1.5 h-auto shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)] hover:bg-gray-50/50"
-          >
-            <img
-              src="/images/user-avatar.png"
-              alt="User avatar"
-              className="h-8 w-8 rounded-full object-cover"
-            />
-            <span className="font-heading text-base font-semibold leading-[19px] text-[#303030]">
-              {userName}
-            </span>
-            <ChevronDown className="h-6 w-6 text-[#303030]" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                id="topbar-user-menu"
+                className="flex items-center gap-2 rounded-xl px-3 py-1.5 h-auto shadow-[0px_32px_48px_0px_rgba(0,0,0,0.2),0px_16px_48px_0px_rgba(0,0,0,0.12)] hover:bg-gray-50/50 cursor-pointer"
+              >
+                <img
+                  src="/images/user-avatar.png"
+                  alt="User avatar"
+                  className="h-8 w-8 rounded-full object-cover"
+                />
+                <span className="font-heading text-base font-semibold leading-[19px] text-[#303030]">
+                  {userName}
+                </span>
+                <ChevronDown className="h-6 w-6 text-[#303030]" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-white border border-gray-100 rounded-xl shadow-lg mt-1 p-1">
+              <DropdownMenuItem
+                onClick={handleSignOut}
+                className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer rounded-lg font-medium transition-colors duration-150"
+              >
+                Log Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -112,15 +129,27 @@ export function TopBar() {
             className="h-8 w-8 rounded-full object-cover"
           />
 
-          <Button
-            type="button"
-            variant="ghost"
-            aria-label="Open menu"
-            id="mobile-menu-btn"
-            className="flex h-6 w-6 items-center justify-center p-0"
-          >
-            <Menu className="h-6 w-6 text-[#303030]" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                aria-label="Open menu"
+                id="mobile-menu-btn"
+                className="flex h-6 w-6 items-center justify-center p-0 cursor-pointer"
+              >
+                <Menu className="h-6 w-6 text-[#303030]" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-white border border-gray-100 rounded-xl shadow-lg mt-1 p-1">
+              <DropdownMenuItem
+                onClick={handleSignOut}
+                className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer rounded-lg font-medium transition-colors duration-150"
+              >
+                Log Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

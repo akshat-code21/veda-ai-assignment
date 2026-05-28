@@ -127,7 +127,10 @@ assignmentRouter.post("/:id/regenerate", async (req, res) => {
         return res.status(404).json({ message: "Assignment not found" });
     }
 
-    await AssignmentModel.updateOne({ _id: id }, { status: "pending", generatedPaper: undefined });
+    await AssignmentModel.updateOne({ _id: id }, {
+        $set: { status: "pending" },
+        $unset: { generatedPaper: 1, pdfUrl: 1, errorMessage: 1 }
+    });
     await addJob({
         userId: res.locals.session.session.userId,
         title: assignment.title!,

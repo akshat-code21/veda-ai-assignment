@@ -64,7 +64,7 @@ export function BottomNav({ onAddAssignment }: BottomNavProps) {
             key={tab.label}
             to="/assignments"
             className={`flex flex-col items-center gap-1 rounded-[26px] px-2 py-1.5 transition-colors ${tab.active
-              ? "bg-white/10"
+              ? ""
               : "bg-transparent"
               }`}
           >
