@@ -13,10 +13,11 @@ export const auth = betterAuth({
     trustedOrigins: [env.FRONTEND_URL],
     advanced: {
         crossSubDomainCookies: {
-            enabled: false,
+            enabled: isProduction,
+            domain: isProduction ? ".akshat21.me" : undefined,
         },
         defaultCookieAttributes: {
-            sameSite: isProduction ? "none" : "lax",
+            sameSite: isProduction ? "lax" : "lax",
             secure: isProduction,
         },
     },
