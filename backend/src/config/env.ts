@@ -8,7 +8,6 @@ const envSchema = z.object({
     FRONTEND_URL: z.string(),
     REDIS_URL: z.string(),
     REDIS_PASSWORD: z.string().optional(),
-    OPENROUTER_API_KEY: z.string(),
     UPLOAD_DIR: z.string().default("uploads"),
     AWS_ACCESS_KEY_ID: z.string(),
     AWS_SECRET_ACCESS_KEY: z.string(),

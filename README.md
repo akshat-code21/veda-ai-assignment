@@ -2,7 +2,7 @@
 
 An AI-powered assessment platform that lets teachers create assignments, generate structured question papers using LLMs, and view/download the output as formatted PDFs — all in real time.
 
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-16-000?logo=next.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-5-000?logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white)
@@ -15,7 +15,7 @@ An AI-powered assessment platform that lets teachers create assignments, generat
 
 - **Assignment Creation** — Form with title, subject, due date, question types (MCQ, short, long, true/false), configurable question counts & marks, file upload (PDF/text), and additional instructions
 - **Zod Validation** — Frontend form validated with Zod schemas; no empty or negative values allowed
-- **AI Question Generation** — Structured prompts sent to OpenRouter LLM (`gpt-oss-120b`); output validated with Zod schemas into sections with difficulty tags
+- **AI Question Generation** — Structured prompts sent to OpenAI; output validated with Zod schemas into sections with difficulty tags
 - **PDF Generation** — Server-side PDF creation with PDFKit (Inter font, student info section, sections, difficulty badges, answer key)
 - **Real-Time Updates** — WebSocket notifications push status changes (pending → processing → completed/failed) to the frontend instantly
 - **Background Processing** — BullMQ job queue with Redis for async generation; 3 retry attempts with exponential backoff
@@ -30,7 +30,7 @@ An AI-powered assessment platform that lets teachers create assignments, generat
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Frontend (React + Vite + Tailwind + Shadcn)               │
+│  Frontend (Next.js 16 + App Router + Tailwind + Shadcn)    │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌───────────┐  │
 │  │  Login/  │  │Dashboard │  │ Create   │  │  Output   │  │
 │  │ Register │  │  (List)  │  │Assignment│  │  (PDF)    │  │
@@ -76,14 +76,14 @@ An AI-powered assessment platform that lets teachers create assignments, generat
 
 | Layer | Technology |
 |-------|-----------|
-| **Frontend** | React 19, Vite, TypeScript, Tailwind CSS v4, Shadcn/UI |
+| **Frontend** | Next.js 16 (App Router), TypeScript, Tailwind CSS v4, Shadcn/UI |
 | **State** | Zustand, TanStack React Query |
 | **Auth** | Better Auth (email/password, session cookies) |
 | **Validation** | Zod (frontend forms + LLM output parsing) |
 | **Backend** | Node.js, Express 5, TypeScript, Bun runtime |
 | **Database** | MongoDB Atlas (Mongoose ODM) |
 | **Cache/Queue** | Redis (IORedis) + BullMQ |
-| **AI** | OpenRouter (`gpt-oss-120b`) |
+| **AI** | OpenAI |
 | **Storage** | AWS S3 (file uploads + generated PDFs) |
 | **PDF** | PDFKit (server-side generation) |
 | **WebSocket** | `ws` library (real-time status updates) |
@@ -99,7 +99,7 @@ An AI-powered assessment platform that lets teachers create assignments, generat
 - [Docker](https://docker.com/) (for local Redis) — or a Redis Cloud account
 - MongoDB Atlas cluster
 - AWS S3 bucket
-- OpenRouter API key
+- OpenAI API key
 
 ### 1. Clone the repo
 
@@ -131,7 +131,7 @@ FRONTEND_URL=http://localhost:5173
 
 REDIS_URL=redis://localhost:6379
 
-OPENROUTER_API_KEY=sk-or-...
+OPENAI_API_KEY=sk-proj-...
 
 AWS_ACCESS_KEY_ID=...
 AWS_SECRET_ACCESS_KEY=...
@@ -146,18 +146,18 @@ bun run dev
 # Server starts on http://localhost:3000
 ```
 
-### 4. Frontend setup
+### 4. Frontend setup (Next.js)
 
 ```bash
-cd frontend
+cd next-frontend
 bun install
 ```
 
-Create `frontend/.env`:
+Create `next-frontend/.env.local`:
 
 ```env
-VITE_API_URL=http://localhost:3000
-VITE_WS_URL=ws://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:3000
+NEXT_PUBLIC_WS_URL=ws://localhost:3000
 ```
 
 Start the dev server:
@@ -180,14 +180,20 @@ bun run dev
 
 ```
 veda-ai/
-├── frontend/
-│   └── src/
-│       ├── components/       # UI components (Sidebar, TopBar, FilledState, etc.)
-│       ├── pages/            # Route pages (Login, Register, Assignments, Create, Output)
-│       ├── lib/              # API client, auth client, utilities
-│       ├── store/            # Zustand store (assignment state)
-│       ├── hooks/            # Custom hooks (WebSocket)
-│       └── types/            # TypeScript types
+├── next-frontend/            # Next.js 16 (App Router)
+│   └── app/
+│       ├── (auth)/           # Login, Register routes
+│       ├── (dashboard)/      # Dashboard layout + sub-routes
+│       └── layout.tsx        # Root layout (providers, fonts)
+│   ├── components/           # UI components (Sidebar, TopBar, FilledState, etc.)
+│   ├── lib/                  # API client, auth client, utilities
+│   ├── store/                # Zustand store (assignment state)
+│   ├── hooks/                # Custom hooks (WebSocket)
+│   ├── types/                # TypeScript types
+│   ├── providers/            # React Query provider
+│   └── proxy.ts              # Next.js 16 middleware (auth guard)
+│
+├── frontend/                 # Original Vite app (archived)
 │
 ├── backend/
 │   └── src/

@@ -1,11 +1,6 @@
-import { OpenRouter } from "@openrouter/sdk";
 import OpenAI from "openai";
 import { env } from "../config/env";
 import { z } from "zod";
-
-const openrouter = new OpenRouter({
-    apiKey: env.OPENROUTER_API_KEY
-});
 
 const openai = new OpenAI({
     apiKey: env.OPENAI_API_KEY
@@ -114,19 +109,6 @@ ${input.fileUrl ? "A reference document has been provided. Base questions on its
 
 Return ONLY valid JSON matching the schema. No preamble, no markdown.`;
 
-    // const messages: Parameters<typeof openrouter.chat.send>[0]["chatRequest"]["messages"] = [
-    //     { role: "system", content: systemPrompt },
-    //     {
-    //         role: "user",
-    //         content: input.fileUrl
-    //             ? [
-    //                 { type: "text" as const, text: userPrompt },
-    //                 { type: "file" as const, file: { fileData: input.fileUrl } },
-    //             ]
-    //             : userPrompt,
-    //     },
-    // ];
-
     const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
         { role: "system", content: systemPrompt },
         {
@@ -139,25 +121,13 @@ Return ONLY valid JSON matching the schema. No preamble, no markdown.`;
 
     let response;
     try {
-        // response = await openrouter.chat.send({
-        //     chatRequest: {
-        //         model: "z-ai/glm-5",
-        //         messages,
-        //         responseFormat: { type: "json_object" },
-        //     }
-        // });
         response = await openai.chat.completions.create({
-            model: "gpt-5.4-nano",
+            model: "gpt-4o",
             messages,
             response_format: { "type": "json_object" }
         })
     } catch (err: any) {
-        if (err.name === "ResponseValidationError") {
-            console.error("\nOpenRouter ResponseValidationError:\n", err.pretty ? err.pretty() : err);
-            console.error("\nRaw response value received from OpenRouter API:\n", JSON.stringify(err.rawValue, null, 2));
-        } else {
-            console.error("Error calling OpenRouter:", err);
-        }
+        console.error("Error calling OpenAI:", err);
         throw err;
     }
 
