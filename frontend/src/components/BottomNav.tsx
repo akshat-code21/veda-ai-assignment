@@ -40,7 +40,7 @@ interface BottomNavProps {
 
 export function BottomNav({ onAddAssignment }: BottomNavProps) {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col items-end gap-3 px-2.5 pb-5 pt-10 lg:hidden bg-gradient-to-t from-[#CECECE] via-[#CECECE]/95 to-transparent">
+    <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col items-end gap-3 px-2.5 pb-5 pt-10 lg:hidden bg-linear-to-t from-[#CECECE] via-[#CECECE]/95 to-transparent">
       {onAddAssignment && (
         <Button
           type="button"

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react"
-import { CloudUpload, X, FileText, CheckCircle } from "lucide-react"
+import { CloudUpload, X, FileText } from "lucide-react"
 import { Button } from "./button"
 
 interface FileUploadProps {
@@ -10,7 +10,7 @@ interface FileUploadProps {
 export function FileUpload({ file, onChange }: FileUploadProps) {
   const [isDragActive, setIsDragActive] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [_previewUrl, setPreviewUrl] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleDrag = (e: React.DragEvent) => {
