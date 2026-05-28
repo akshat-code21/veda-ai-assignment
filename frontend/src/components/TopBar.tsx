@@ -74,7 +74,7 @@ export function TopBar() {
                 type="button"
                 variant="ghost"
                 id="topbar-user-menu"
-                className="flex items-center gap-2 rounded-xl px-3 py-1.5 h-auto hover:bg-gray-50/50 cursor-pointer shadow-none"
+                className="flex items-center gap-2 rounded-xl px-3 py-1.5 h-auto hover:bg-[#EBEBEB] cursor-pointer shadow-none"
               >
                 <img
                   src="/images/user-avatar.png"

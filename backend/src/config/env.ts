@@ -15,7 +15,9 @@ const envSchema = z.object({
     AWS_REGION: z.string(),
     S3_BUCKET_NAME: z.string(),
     CLOUDFRONT_DOMAIN: z.string(),
-    OPENAI_API_KEY: z.string()
+    OPENAI_API_KEY: z.string(),
+    GOOGLE_CLIENT_ID: z.string(),
+    GOOGLE_CLIENT_SECRET: z.string()
 })
 
 const _env = envSchema.safeParse(process.env);
