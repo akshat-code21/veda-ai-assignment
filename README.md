@@ -30,34 +30,34 @@ An AI-powered assessment platform that lets teachers create assignments, generat
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Frontend (Next.js 16 + App Router + Tailwind + Shadcn)    │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌───────────┐  │
-│  │  Login/  │  │Dashboard │  │ Create   │  │  Output   │  │
-│  │ Register │  │  (List)  │  │Assignment│  │  (PDF)    │  │
-│  └──────────┘  └──────────┘  └──────────┘  └───────────┘  │
-│       ↕ Axios + Cookies          ↕ WebSocket               │
+│  Frontend (Next.js 16 + App Router + Tailwind + Shadcn)     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌───────────┐    │
+│  │  Login/  │  │Dashboard │  │ Create   │  │  Output   │    │
+│  │ Register │  │  (List)  │  │Assignment│  │  (PDF)    │    │
+│  └──────────┘  └──────────┘  └──────────┘  └───────────┘    │
+│       ↕ Axios + Cookies          ↕ WebSocket                │
 └─────────────────────────────────────────────────────────────┘
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  Backend (Node.js + Express + TypeScript)                   │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌───────────┐  │
-│  │  Better  │  │  REST    │  │  BullMQ  │  │ WebSocket │  │
-│  │  Auth    │  │  API     │  │  Queue   │  │  Server   │  │
-│  └──────────┘  └──────────┘  └──────────┘  └───────────┘  │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌───────────┐    │
+│  │  Better  │  │  REST    │  │  BullMQ  │  │ WebSocket │    │
+│  │  Auth    │  │  API     │  │  Queue   │  │  Server   │    │
+│  └──────────┘  └──────────┘  └──────────┘  └───────────┘    │
 │       │              │              │              │        │
 │       ▼              ▼              ▼              │        │
-│  ┌──────────┐  ┌──────────┐  ┌──────────────┐    │        │
-│  │ MongoDB  │  │ AWS S3   │  │  Worker      │    │        │
-│  │ Atlas    │  │ (files)  │  │  ├─ LLM Call  │───┘        │
-│  └──────────┘  └──────────┘  │  ├─ PDF Gen   │            │
-│                              │  └─ S3 Upload │            │
-│                              └──────────────┘            │
-│                                     │                      │
-│                              ┌──────────┐                  │
-│                              │  Redis   │                  │
-│                              │ (Queue)  │                  │
-│                              └──────────┘                  │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────┐    │          │
+│  │ MongoDB  │  │ AWS S3   │  │  Worker      │    │          │
+│  │ Atlas    │  │ (files)  │  │  ├─ LLM Call  │───┘          │
+│  └──────────┘  └──────────┘  │  ├─ PDF Gen   │              │
+│                              │  └─ S3 Upload │              │
+│                              └──────────────┘               │
+│                                     │                       │
+│                              ┌──────────┐                   │
+│                              │  Redis   │                   │
+│                              │ (Queue)  │                   │
+│                              └──────────┘                   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
