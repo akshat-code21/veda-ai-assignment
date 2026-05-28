@@ -64,7 +64,7 @@ export function FilledState({
         <Button
           type="button"
           variant="ghost"
-          onClick={() => {}}
+          onClick={() => { }}
           aria-label="Go back"
           className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFFFFF]/25 shadow-[0px_4px_12px_rgba(0,0,0,0.05)] hover:bg-gray-50 active:scale-95 p-0"
         >
@@ -102,7 +102,7 @@ export function FilledState({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 flex-1 pb-20">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 flex-1 pb-20">
         {filteredAssignments.map((assignment) => (
           <div
             key={assignment._id}

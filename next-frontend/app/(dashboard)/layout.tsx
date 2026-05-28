@@ -27,7 +27,7 @@ export default function DashboardLayout({
 
   return (
     <AuthGuard>
-      <div className="flex h-screen! overflow-hidden bg-[#CECECE] lg:bg-linear-to-b lg:from-[#EEEEEE] lg:to-[#DADADA]">
+      <div className="flex h-screen! overflow-hidden bg-[#DBDBDB]">
         <div className="hidden lg:block p-3 h-full shrink-0">
           <Sidebar assignmentsCount={assignments.length} />
         </div>
