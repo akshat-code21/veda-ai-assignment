@@ -66,9 +66,29 @@ An AI-powered assessment platform that lets teachers create assignments, generat
 1. Teacher submits assignment form → `POST /api/assignments` (multipart)
 2. Backend uploads file to S3 (if attached), saves assignment to MongoDB (status: `pending`)
 3. BullMQ job enqueued → WebSocket broadcasts `assignment:processing`
-4. Worker calls OpenRouter LLM → validates JSON with Zod → generates PDF with PDFKit → uploads to S3
+4. Worker calls OpenAI → validates JSON with Zod → generates PDF with PDFKit → uploads to S3
 5. Assignment updated (status: `completed`, `pdfUrl` set) → WebSocket broadcasts `assignment:completed`
-6. Frontend auto-polls / receives WebSocket event → renders PDF in viewer
+6. Frontend receives WebSocket event → invalidates React Query cache → refetches → renders PDF
+
+---
+
+## Approach
+
+### Frontend (Next.js 16 + App Router)
+
+- **Routes**: Organized into `(auth)` and `(dashboard)` route groups. The dashboard layout wraps all authenticated pages with `AuthGuard`, sidebar, topbar, and bottom nav.
+- **State Management**: Dual-layer approach — **TanStack React Query** handles server state (assignments list, single assignment) with automatic caching and background refetching, while **Zustand** provides lightweight client state (active assignment, sidebar counter) for instant UI updates without server roundtrips.
+- **Authentication**: Better Auth client-side SDK handles login/register/social auth. API calls use `credentials: "include"` for cross-origin cookie-based sessions. The `proxy.ts` (Next.js 16 middleware) only handles the root `/` → `/assignments` redirect; actual auth protection is delegated to the client-side `AuthGuard` component which calls the backend's session API.
+- **Real-Time Updates**: A `useWebSocket` hook connects to the backend's WebSocket server when an assignment is processing. On receiving `assignment:completed`/`assignment:failed` events, it invalidates the React Query cache and updates the Zustand store, triggering seamless UI transitions from the loading state to the PDF viewer.
+- **PDF Viewer**: `@embedpdf/react-pdf-viewer` is dynamically imported with `ssr: false` to avoid server-side rendering conflicts. The viewer is configured with `ZoomMode.FitWidth` and disabled annotation/edit toolbars for a read-only experience.
+- **Caching**: React Query configured with 5-minute stale time, 30-minute garbage collection, and 2 retry attempts. The assignments list is invalidated on creation and deletion to keep the sidebar counter in sync.
+
+### Backend (Express + BullMQ + OpenAI)
+
+- **API Design**: RESTful endpoints for CRUD operations on assignments. File uploads are handled via Multer and stored on AWS S3 with presigned URL generation for downloads.
+- **Background Processing**: Assignment generation is dequeued via BullMQ (Redis-backed). The worker calls OpenAI's chat completions API with a structured prompt that defines the JSON schema, question distribution, and difficulty levels. The LLM output is validated against a Zod schema before PDF generation.
+- **PDF Generation**: PDFKit generates the final question paper with Inter font, sections, difficulty badges, and answer key. The PDF is uploaded to S3 and the assignment record is updated with the public URL.
+- **WebSocket**: A dedicated WebSocket server broadcasts status changes (`pending` → `processing` → `completed`/`failed`) to connected clients, filtered by `assignmentId`.
 
 ---
 
