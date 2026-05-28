@@ -6,12 +6,16 @@ import { toast } from "sonner"
 import { AssignmentOutput } from "@/components/AssignmentOutput"
 import { assignmentApi } from "@/lib/api"
 import { useWebSocket } from "@/hooks/use-websocket"
-import { useCallback } from "react"
+import { useAssignmentStore } from "@/store/useAssignmentStore"
+import { useCallback, useEffect } from "react"
 
 export default function AssignmentOutputPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { id } = useParams<{ id: string }>()
+
+  const updateAssignmentStatus = useAssignmentStore((state) => state.updateAssignmentStatus)
+  const setActiveAssignment = useAssignmentStore((state) => state.setActiveAssignment)
 
   const { data: assignment, isLoading, error } = useQuery({
     queryKey: ["assignment", id],
@@ -19,13 +23,28 @@ export default function AssignmentOutputPage() {
     enabled: !!id,
   })
 
+  useEffect(() => {
+    if (assignment) {
+      setActiveAssignment(assignment)
+    }
+  }, [assignment, setActiveAssignment])
+
   const isProcessing = assignment?.status === "pending" || assignment?.status === "processing"
 
   const handleWsStatusChange = useCallback((type: string) => {
     if (type === "assignment:completed" || type === "assignment:failed" || type === "assignment:processing") {
       queryClient.invalidateQueries({ queryKey: ["assignment", id] })
+      const statusMap: Record<string, string> = {
+        "assignment:completed": "completed",
+        "assignment:failed": "failed",
+        "assignment:processing": "processing",
+      }
+      const newStatus = statusMap[type]
+      if (newStatus && id) {
+        updateAssignmentStatus(id, newStatus as any)
+      }
     }
-  }, [id, queryClient])
+  }, [id, queryClient, updateAssignmentStatus])
 
   useWebSocket({
     assignmentId: id || "",

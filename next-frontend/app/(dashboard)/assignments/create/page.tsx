@@ -2,13 +2,17 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { CreateAssignment } from "@/components/CreateAssignment"
 import { assignmentApi } from "@/lib/api"
+import { useAssignmentStore } from "@/store/useAssignmentStore"
 import type { Assignment } from "@/types/assignment"
 
 export default function CreateAssignmentPage() {
   const router = useRouter()
+  const queryClient = useQueryClient()
+  const addAssignment = useAssignmentStore((state) => state.addAssignment)
   const [submitting, setSubmitting] = useState(false)
 
   const handleCreateAssignment = async (assignment: Assignment, file?: File | null) => {
@@ -37,6 +41,8 @@ export default function CreateAssignmentPage() {
       }
 
       const created = await assignmentApi.create(formData)
+      addAssignment(created)
+      queryClient.invalidateQueries({ queryKey: ["assignments"] })
       toast.success("Assignment created! Generation will begin shortly.")
       router.push(`/assignments/${created._id}`)
     } catch (err) {
