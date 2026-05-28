@@ -124,7 +124,7 @@ An AI-powered assessment platform that lets teachers create assignments, generat
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/veda-ai.git
+git clone https://github.com/akshat-code21/veda-ai-assignment
 cd veda-ai
 ```
 
